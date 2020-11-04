@@ -27,6 +27,9 @@ winds = {
 # Wind direction for our forest
 WIND = 2
 
+# Wind strength (0-3)
+WIND_STRENGTH = 2
+
 '''
                     Forest Fire
 
@@ -47,6 +50,7 @@ WIND = 2
         4.  An empty space grows a new tree with probability 'new_growth'.
         5.  An old tree takes 2 steps to burn.
         6.  Fire can only spread in the wind's direction (North = 1, East = 2, South = 3, West = 4).
+        7.  The fire spreads further if the wind is stronger
 
 '''
 
@@ -91,6 +95,25 @@ class Grid:
 
     def voisins(self,x,y):
         return [self._gridbis[vx,vy] for (vx,vy) in self.indiceVoisins(x,y)]
+    
+    def furtherNeighbours(self, x, y, d):
+        neighbours = self.indiceVoisins(x, y)
+        further_neighbours = neighbours.copy()
+        
+        # We dont want to exceed a certain wind strength
+        if d > 3: 
+            d = 3
+        
+        for k in range(d-1):
+            tmp_neighbours = [self.indiceVoisins(xbis, ybis) for (xbis, ybis) in neighbours]
+            tmp_neighbours = sum(tmp_neighbours, []) #Flatten the list 
+            further_neighbours += tmp_neighbours
+            further_neighbours = list(set(further_neighbours)) #Uniq values
+            neighbours = tmp_neighbours.copy()
+            
+
+        return [self._gridbis[vx, vy] for (vx, vy) in further_neighbours]
+ 
    
     def sommeVoisins(self, x, y):
         return sum(self.voisins(x,y))
@@ -119,8 +142,9 @@ class Forest:
     _old = None
     _young = None
     _burnt = None
+    _wind_strength = None
     
-    def __init__(self, gridTrees, gridBurning, wind=None):
+    def __init__(self, gridTrees, gridBurning, wind=None, wind_strength=0):
         
         # Grids needed to store burning and tree states of cells
         self._trees = gridTrees
@@ -132,7 +156,8 @@ class Forest:
         self._young = __gridDim__[0] * __gridDim__[1] * tree_ratio
         self._empties = __gridDim__[0] * __gridDim__[1] * (1-tree_ratio)
         
-        if wind is not None:
+        if wind is not None and wind_strength > 0:
+            self._wind_strength = wind_strength
             v = winds[wind]
             self._burning._indexVoisins = [ w for w in self._burning._indexVoisins if w[v[0]] != v[1]]
             print(self._burning._indexVoisins)
@@ -143,7 +168,11 @@ class Forest:
         
     # Tree igniting treatment
     def ignite_grow(self, x, y):
-        neighbours = self._burning.voisins(x, y)
+        
+        if self._wind_strength > 0:
+            neighbours = self._burning.furtherNeighbours(x, y, self._wind_strength)
+        else:
+            neighbours = self._burning.voisins(x, y)
 
         # Case at least one neighbour is burning
         if 1 in neighbours:
@@ -225,8 +254,9 @@ class Scene:
         pygame.init()
         self._screen = pygame.display.set_mode(__screenSize__)
         self._font = pygame.font.SysFont('Arial',20)
-        self._forest = Forest(Grid(empty=False), Grid(), WIND)
+        self._forest = Forest(Grid(empty=False), Grid(), WIND, WIND_STRENGTH)
 
+    # Metho drawing actual forest simulation on the scene 
     def drawMe(self):
         if self._forest._trees is None or self._forest._burning is None:
             return
@@ -237,10 +267,15 @@ class Scene:
                         getColorCell(self._forest.getTree(x,y)),
                         (x*__cellSize__ + 1, y*__cellSize__ + 1, __cellSize__-2, __cellSize__-2))
         
-        # Legend
-        
+        self.drawLegend()
+
+    def drawText(self, text, position, color = (0,0,0)):
+        self._screen.blit(self._font.render(text,1,color),position)
+    
+    def drawLegend(self):
         total = __gridDim__[0] * __gridDim__[1] 
-        
+
+        # Legend
         pygame.draw.line(self._screen, (0, 0, 0), (900, 0), (900, 1200), width=2)
         
         pygame.draw.rect(self._screen, (0, 0, 0), (915, 15, 30, 30))
@@ -260,16 +295,12 @@ class Scene:
         self.drawText("Empty cell (" + str(int(self._forest._empties)) + " / " + str(np.round(1.*self._forest._empties/total * 100, 2)) + "%)", (960, 140))
         
         # Parameters
-        
         self.drawText("Lightning probability : " + str(lightning*100) + "%", (920, 600))
         self.drawText("Growth probability : " + str(new_growth*100) + "%", (920, 630))
         self.drawText("Initial tree rate : " + str(tree_ratio*100) + "%", (920, 660))
         self.drawText("Wind direction : " + winds[WIND][2], (920, 690))
-
-
-    def drawText(self, text, position, color = (0,0,0)):
-        self._screen.blit(self._font.render(text,1,color),position)
-
+        self.drawText("Wind strength : " + str(WIND_STRENGTH), (920, 720))
+        
     def update(self):
         self._forest.update()
            
