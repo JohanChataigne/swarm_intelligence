@@ -2,6 +2,9 @@ import sys, math, random
 import pygame
 import pygame.draw
 import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+import input_box as ib
 
 __screenSize__ = (1250,900)
 __gridSize__ = (900,900) 
@@ -13,7 +16,7 @@ __colors__ = [(255,255,255),(0,255,0),(0, 86, 27),(255,140,0)]
 
 lightning = 0.00002 #Probability of lightning
 new_growth = 0.002 #Probability of new growth
-tree_ratio = 0.65 #Tree rate in the space
+tree_ratio = 0.50 #Tree rate in the space
 
 # Map winds with their opposite direction (sense, direction, label)
 winds = {
@@ -23,10 +26,8 @@ winds = {
     4 : (0, -1, "West")  #(-1, 0)
 }
 
-
 # Wind direction for our forest
 WIND = 2
-
 # Wind strength (0-3)
 WIND_STRENGTH = 2
 
@@ -90,6 +91,9 @@ class Grid:
         assert (np.array_equal(self._grid, self._gridbis))
         nx, ny = __gridDim__
 
+    def resetIndexVoisins(self):
+        self._indexVoisins = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
+
     def indiceVoisins(self, x,y):
         return [(dx+x,dy+y) for (dx,dy) in self._indexVoisins if dx+x >=0 and dx+x < __gridDim__[0] and dy+y>=0 and dy+y < __gridDim__[1]] 
 
@@ -142,6 +146,7 @@ class Forest:
     _old = None
     _young = None
     _burnt = None
+    _wind = None
     _wind_strength = None
     
     def __init__(self, gridTrees, gridBurning, wind=None, wind_strength=0):
@@ -158,9 +163,10 @@ class Forest:
         
         if wind is not None and wind_strength > 0:
             self._wind_strength = wind_strength
+            self._wind = wind
             v = winds[wind]
             self._burning._indexVoisins = [ w for w in self._burning._indexVoisins if w[v[0]] != v[1]]
-            print(self._burning._indexVoisins)
+            #print(self._burning._indexVoisins)
         
     # Get state of a tree i.e (tree?, burning?)
     def getTree(self, x, y):
@@ -168,9 +174,13 @@ class Forest:
         
     # Tree igniting treatment
     def ignite_grow(self, x, y):
-        
-        if self._wind_strength > 0:
+
+        self._burning.resetIndexVoisins()
+        if self._wind is not None and self._wind_strength > 0:
+            v = winds[self._wind]
+            self._burning._indexVoisins = [ w for w in self._burning._indexVoisins if w[v[0]] != v[1]]
             neighbours = self._burning.furtherNeighbours(x, y, self._wind_strength)
+            
         else:
             neighbours = self._burning.voisins(x, y)
 
@@ -278,28 +288,28 @@ class Scene:
         # Legend
         pygame.draw.line(self._screen, (0, 0, 0), (900, 0), (900, 1200), width=2)
         
-        pygame.draw.rect(self._screen, (0, 0, 0), (915, 15, 30, 30))
-        pygame.draw.rect(self._screen, __colors__[2], (920, 20, 20, 20))
-        self.drawText("Old tree (" + str(int(self._forest._old)) + " / " + str(np.round(1.*self._forest._old/total * 100, 2)) + "%)", (960, 20))
-        
-        pygame.draw.rect(self._screen, (0, 0, 0), (915, 55, 30, 30))
-        pygame.draw.rect(self._screen, __colors__[1], (920, 60, 20, 20))
-        self.drawText("Young tree (" + str(int(self._forest._young)) + " / " + str(np.round(1.*self._forest._young/total * 100, 2)) + "%)", (960, 60))
-        
         pygame.draw.rect(self._screen, (0, 0, 0), (915, 95, 30, 30))
-        pygame.draw.rect(self._screen, __colors__[3], (920, 100, 20, 20))
-        self.drawText("Burning tree (" + str(int(self._forest._burnt)) + " / " + str(np.round(1.*self._forest._burnt/total * 100, 2)) + "%)", (960, 100))
+        pygame.draw.rect(self._screen, __colors__[2], (920, 100, 20, 20))
+        self.drawText("Old tree (" + str(int(self._forest._old)) + " / " + str(np.round(1.*self._forest._old/total * 100, 2)) + "%)", (960, 100))
         
         pygame.draw.rect(self._screen, (0, 0, 0), (915, 135, 30, 30))
-        pygame.draw.rect(self._screen, __colors__[0], (920, 140, 20, 20))
-        self.drawText("Empty cell (" + str(int(self._forest._empties)) + " / " + str(np.round(1.*self._forest._empties/total * 100, 2)) + "%)", (960, 140))
+        pygame.draw.rect(self._screen, __colors__[1], (920, 140, 20, 20))
+        self.drawText("Young tree (" + str(int(self._forest._young)) + " / " + str(np.round(1.*self._forest._young/total * 100, 2)) + "%)", (960, 140))
+        
+        pygame.draw.rect(self._screen, (0, 0, 0), (915, 175, 30, 30))
+        pygame.draw.rect(self._screen, __colors__[3], (920, 180, 20, 20))
+        self.drawText("Burning tree (" + str(int(self._forest._burnt)) + " / " + str(np.round(1.*self._forest._burnt/total * 100, 2)) + "%)", (960, 180))
+        
+        pygame.draw.rect(self._screen, (0, 0, 0), (915, 215, 30, 30))
+        pygame.draw.rect(self._screen, __colors__[0], (920, 220, 20, 20))
+        self.drawText("Empty cell (" + str(int(self._forest._empties)) + " / " + str(np.round(1.*self._forest._empties/total * 100, 2)) + "%)", (960, 220))
         
         # Parameters
-        self.drawText("Lightning probability : " + str(lightning*100) + "%", (920, 600))
-        self.drawText("Growth probability : " + str(new_growth*100) + "%", (920, 630))
-        self.drawText("Initial tree rate : " + str(tree_ratio*100) + "%", (920, 660))
-        self.drawText("Wind direction : " + winds[WIND][2], (920, 690))
-        self.drawText("Wind strength : " + str(WIND_STRENGTH), (920, 720))
+        self.drawText("Initial tree rate: " + str(tree_ratio*100) + "%", (920, 460))
+        self.drawText("Lightning probability (%): ", (920, 500))
+        self.drawText("Growth probability (%):", (920, 560))
+        self.drawText("Wind direction: ", (920, 620))
+        self.drawText("Wind strength: ", (920, 680))
         
     def update(self):
         self._forest.update()
@@ -309,15 +319,67 @@ def main():
     scene = Scene()
     done = False
     clock = pygame.time.Clock()
+
+    global lightning
+    global new_growth
+
+    input_boxes = []
+    input_boxes.append(ib.InputBox(920, 525, 40, 30, scene._screen, text=str(lightning * 100)))
+    input_boxes.append(ib.InputBox(920, 585, 40, 30, scene._screen, text=str(new_growth * 100)))
+    input_boxes.append(ib.InputBox(920, 645, 40, 30, scene._screen, text=winds[scene._forest._wind][2]))
+    input_boxes.append(ib.InputBox(920, 705, 40, 30, scene._screen, text=str(scene._forest._wind_strength)))
+
     while done == False:
+        events = pygame.event.get()
+
         scene.drawMe()
+
+        for b in input_boxes:
+            b.draw()
+
         pygame.display.flip()
         scene.update()
         clock.tick(2)
-        for event in pygame.event.get():
+
+        for event in events:
             if event.type == pygame.QUIT: 
                 print("Exiting")
                 done=True
+
+            for b in input_boxes:
+                b.handle_event(event)
+        
+        for b in input_boxes:
+            b.update()
+            
+        try:
+            lightning = float(input_boxes[0].text)/100
+        except ValueError:
+            lightning = 0
+
+        try:
+            new_growth = float(input_boxes[1].text)/100
+        except ValueError:
+            new_growth = 0
+
+        wind_dir = input_boxes[2].text.upper()
+        if(wind_dir == "NORTH"):
+            scene._forest._wind = 1
+        elif(wind_dir == "EAST"):
+            scene._forest._wind = 2
+        elif(wind_dir == "SOUTH"):
+            scene._forest._wind = 3
+        elif(wind_dir == "WEST"):
+            scene._forest._wind = 4
+        else:
+            scene._forest._wind = None
+            scene._forest._wind_strength = 0
+
+        try:
+            scene._forest._wind_strength = int(input_boxes[3].text) 
+        except ValueError:
+            scene._forest._wind = None
+            scene._forest._wind_strength = 0
 
     pygame.quit()
 
