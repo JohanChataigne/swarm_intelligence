@@ -18,6 +18,9 @@ __colors__ = [(255,255,255),(0,255,0),(0, 86, 27),(255,140,0)]
 lightning = 0.00002 #Probability of lightning
 new_growth = 0.002 #Probability of new growth
 tree_ratio = 0.50 #Tree rate in the space
+river = true
+lakes = 0
+
 
 # Map winds with their opposite direction (sense, direction, label)
 winds = {
@@ -54,6 +57,7 @@ WIND_STRENGTH = 0
         5.  An old tree takes 2 steps to burn.
         6.  Fire can only spread in the wind's direction (North = 1, East = 2, South = 3, West = 4).
         7.  The fire spreads further if the wind is stronger
+        8   Water stops fire, except if the wind is strong enough...
 
 '''
 
@@ -76,8 +80,6 @@ class Grid:
     _indexVoisins = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
     
     def __init__(self, empty=True):
-        
-        #print("Creating grid of dimensions " + str(__gridDim__))
         
         if empty:
             self._grid = np.zeros(__gridDim__, dtype='int8')
