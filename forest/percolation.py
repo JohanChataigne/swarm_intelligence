@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     for density in densities:
         ft.tree_ratio = density
-        forest = ft.Forest(ft.Grid(empty=False), ft.Grid())
+        forest = ft.Forest(ft.gr.Grid(empty=False, ratio=density), ft.gr.Grid())
 
         done = False       
         while done == False:

@@ -1,0 +1,3 @@
+# Ingore these files
+.ipynb_checkpoints/
+__pycache__/
