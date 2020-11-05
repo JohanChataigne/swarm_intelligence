@@ -2,7 +2,7 @@ import pygame as pg
 
 pg.init()
 COLOR_INACTIVE = pg.Color((0, 0, 0))
-COLOR_ACTIVE = pg.Color((0, 0, 255))
+COLOR_ACTIVE = pg.Color((0, 255, 0))
 FONT = pg.font.Font(None, 32)
 
 
@@ -15,6 +15,10 @@ class InputBox:
         self.txt_surface = FONT.render(text, True, self.color)
         self.active = False
         self.screen = screen
+
+    def updateText(self, text):
+        self.text = text
+        self.txt_surface = FONT.render(self.text, True, COLOR_INACTIVE)
 
     def handle_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
@@ -36,8 +40,8 @@ class InputBox:
                 else:
                     self.text += event.unicode
                 # Re-render the text.
-                self.txt_surface = FONT.render(self.text, True, self.color)
-
+                self.txt_surface = FONT.render(self.text, True, COLOR_INACTIVE)
+                
     def update(self):
         # Resize the box if the text is too long.
         width = max(200, self.txt_surface.get_width()+10)
