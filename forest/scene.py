@@ -52,6 +52,11 @@ class Scene:
 
     def drawText(self, text, position, color = (0,0,0)):
         self._screen.blit(self._font.render(text,1,color),position)
+
+    def drawElement(self, name, elem, total, x, y, w, h, color):
+        pygame.draw.rect(self._screen, color, (x, y, w, h))
+        pygame.draw.rect(self._screen, (0, 0, 0), (x, y, w, h), 3)
+        self.drawText(name + " (" + str(int(elem)) + " / " + str(np.round(1.*elem/total * 100, 2)) + "%)", (x + 40, y))
     
     def drawLegend(self):
         total = ft.gr.nx * ft.gr.ny 
@@ -59,21 +64,10 @@ class Scene:
         # Legend
         pygame.draw.line(self._screen, (0, 0, 0), (900, 0), (900, 1200), width=2)
         
-        pygame.draw.rect(self._screen, (0, 0, 0), (915, 95, 30, 30))
-        pygame.draw.rect(self._screen, __colors__[2], (920, 100, 20, 20))
-        self.drawText("Old tree (" + str(int(self._forest._old)) + " / " + str(np.round(1.*self._forest._old/total * 100, 2)) + "%)", (960, 100))
-        
-        pygame.draw.rect(self._screen, (0, 0, 0), (915, 135, 30, 30))
-        pygame.draw.rect(self._screen, __colors__[1], (920, 140, 20, 20))
-        self.drawText("Young tree (" + str(int(self._forest._young)) + " / " + str(np.round(1.*self._forest._young/total * 100, 2)) + "%)", (960, 140))
-        
-        pygame.draw.rect(self._screen, (0, 0, 0), (915, 175, 30, 30))
-        pygame.draw.rect(self._screen, __colors__[3], (920, 180, 20, 20))
-        self.drawText("Burning tree (" + str(int(self._forest._burnt)) + " / " + str(np.round(1.*self._forest._burnt/total * 100, 2)) + "%)", (960, 180))
-        
-        pygame.draw.rect(self._screen, (0, 0, 0), (915, 215, 30, 30))
-        pygame.draw.rect(self._screen, __colors__[0], (920, 220, 20, 20))
-        self.drawText("Empty cell (" + str(int(self._forest._empties)) + " / " + str(np.round(1.*self._forest._empties/total * 100, 2)) + "%)", (960, 220))
+        self.drawElement("Old tree", self._forest._old, total, 920, 100, 20, 20, __colors__[2])
+        self.drawElement("Young tree", self._forest._young, total, 920, 140, 20, 20, __colors__[1])
+        self.drawElement("Burning tree", self._forest._burnt, total, 920, 180, 20, 20, __colors__[3])
+        self.drawElement("Empty cell", self._forest._empties, total, 920, 220, 20, 20, __colors__[0])
         
         # Parameters
         self.drawText("Initial tree rate: " + str(ft.TREE_RATIO*100) + "%", (920, 460))
@@ -96,12 +90,12 @@ def try_except_cast(try_val, except_val, cast):
     return ret
 
 # Updates the wind according to the UI  
-def update_wind(buttons, inputs):
+def update_wind_dir(buttons, inputs):
     
     # List of the states of each wind button
     states = [button.active for button in buttons.values()]
     
-    # Check which button is active and update win accordingly
+    # Check which button is active and update wind accordingly
     for index, state in enumerate(states):
         
         if state:
@@ -114,8 +108,23 @@ def update_wind(buttons, inputs):
 
             inputs["wind_strength"].updateText(str(ft.WIND_STRENGTH))
             return
+
+# Updates the wind according to the UI  
+def update_wind_strength(ws_buttons, ws_box):
+
+    if ft.WIND != 0:
+
+        for key in ws_buttons.keys():
+
+            if ws_buttons[key].active:
+                if key == "minus" and ft.WIND_STRENGTH > 1:
+                    ft.WIND_STRENGTH -= 1
+                elif key == "plus" and ft.WIND_STRENGTH < 3:
+                    ft.WIND_STRENGTH += 1
+
+                ws_box.updateText(str(ft.WIND_STRENGTH))
         
-        
+
 if __name__ == '__main__':
 
     scene = Scene()
@@ -126,7 +135,7 @@ if __name__ == '__main__':
     input_boxes = {}
     input_boxes["lightning"] = ibox.InputBox(920, 525, 40, 30, scene._screen, text=str(ft.LIGHTNING * 100))
     input_boxes["new_growth"] = ibox.InputBox(920, 585, 40, 30, scene._screen, text=str(ft.NEW_GROWTH * 100))
-    input_boxes["wind_strength"] = ibox.InputBox(1080, 720, 30, 30, scene._screen, text=str(ft.WIND_STRENGTH), min_width=30)
+    input_boxes["wind_strength"] = ibox.InputBox(1080, 720, 25, 30, scene._screen, text=str(ft.WIND_STRENGTH), min_width=25, writeable=False)
 
     # buttons for wind direction
     wind_buttons = {}
@@ -139,7 +148,7 @@ if __name__ == '__main__':
     # buttons for wind strength
     ws_buttons = {}
     ws_buttons["minus"] = ibut.InputButton(1050, 725, 20, 20, scene._screen, text="-", blink=True)
-    ws_buttons["plus"] = ibut.InputButton(1120, 725, 20, 20, scene._screen, text="+", blink=True)
+    ws_buttons["plus"] = ibut.InputButton(1115, 725, 20, 20, scene._screen, text="+", blink=True)
 
     # Main loop
     while done == False:
@@ -184,7 +193,8 @@ if __name__ == '__main__':
         ft.WIND_STRENGTH = try_except_cast(input_boxes["wind_strength"].text, -1, int)
        
         # Check which wind button is active and update the wind parameters accordingly     
-        update_wind(wind_buttons, input_boxes)
+        update_wind_dir(wind_buttons, input_boxes)
+        update_wind_strength(ws_buttons, input_boxes["wind_strength"])
 
     pygame.quit()
         

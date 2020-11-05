@@ -16,16 +16,12 @@ class InputButton:
         self.text = text
         self.active = active
         self.blink = blink
-        self.blinking = 0
         self.txt_surface = FONT.render(text, True, COLOR_TEXT)
 
     def activate(self, buttons):
 
         self.active = True
         self.color = COLOR_ACTIVE
-
-        if self.blink:
-            self.blinking = 1
         
         if buttons is not None:
             for but in [b for b in buttons.values() if b != self]:
@@ -41,40 +37,28 @@ class InputButton:
 
     def update(self):
         # Resize the box if the text is too long.
-        #width = max(200, self.txt_surface.get_width()+10)
         self.rect.w = self.txt_surface.get_width()+10
+
+    def draw_button(self):
+
+        # Blit the rect.
+        pg.draw.rect(self.screen, self.color, self.rect)
+        pg.draw.rect(self.screen, COLOR_TEXT, self.rect, 1)
+        # Blit the text.
+        txt_x = self.rect.x + (self.rect.width - self.txt_surface.get_width()) / 2
+        txt_y = self.rect.y + (self.rect.height - self.txt_surface.get_height()) / 2
+        self.screen.blit(self.txt_surface, (txt_x, txt_y))
 
     def draw(self):
 
         if self.blink:
 
-            if self.blinking == 0:
-                self.active = False
-                self.color = COLOR_INACTIVE
+            self.draw_button()
+            self.active = False
+            self.color = COLOR_INACTIVE
 
-                # Blit the rect.
-                pg.draw.rect(self.screen, self.color, self.rect)
-                # Blit the text.
-                txt_x = self.rect.x + (self.rect.width - self.txt_surface.get_width()) / 2
-                txt_y = self.rect.y + (self.rect.height - self.txt_surface.get_height()) / 2
-                self.screen.blit(self.txt_surface, (txt_x, txt_y))
-
-            else:
-                self.blinking -= 1
-                # Blit the rect.
-                pg.draw.rect(self.screen, self.color, self.rect)
-                # Blit the text.
-                txt_x = self.rect.x + (self.rect.width - self.txt_surface.get_width()) / 2
-                txt_y = self.rect.y + (self.rect.height - self.txt_surface.get_height()) / 2
-                self.screen.blit(self.txt_surface, (txt_x, txt_y))
-
-            
-            
         else:
-            # Blit the rect.
-            pg.draw.rect(self.screen, self.color, self.rect)
-            # Blit the text.
-            txt_x = self.rect.x + (self.rect.width - self.txt_surface.get_width()) / 2
-            txt_y = self.rect.y + (self.rect.height - self.txt_surface.get_height()) / 2
-            self.screen.blit(self.txt_surface, (txt_x, txt_y))
+
+            self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
+            self.draw_button()
         
