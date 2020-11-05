@@ -80,7 +80,7 @@ class Scene:
         self.drawText("Lightning probability (%): ", (920, 500))
         self.drawText("Growth probability (%):", (920, 560))
         self.drawText("Wind direction: ", (920, 645))
-        self.drawText("Wind strength: ", (920, 680))
+        self.drawText("Wind strength: ", (920, 720))
         
     def update(self):
         self._forest.update()
@@ -126,7 +126,7 @@ if __name__ == '__main__':
     input_boxes = {}
     input_boxes["lightning"] = ibox.InputBox(920, 525, 40, 30, scene._screen, text=str(ft.LIGHTNING * 100))
     input_boxes["new_growth"] = ibox.InputBox(920, 585, 40, 30, scene._screen, text=str(ft.NEW_GROWTH * 100))
-    input_boxes["wind_strength"] = ibox.InputBox(920, 705, 40, 30, scene._screen, text=str(ft.WIND_STRENGTH))
+    input_boxes["wind_strength"] = ibox.InputBox(1080, 720, 30, 30, scene._screen, text=str(ft.WIND_STRENGTH), min_width=30)
 
     # buttons for wind direction
     wind_buttons = {}
@@ -135,6 +135,11 @@ if __name__ == '__main__':
     wind_buttons["east"] = ibut.InputButton(1155, 645, 55, 25, scene._screen, text=str(ft.WINDS[2][2]))
     wind_buttons["south"] = ibut.InputButton(1100, 670, 55, 25, scene._screen, text=str(ft.WINDS[3][2]))
     wind_buttons["west"] = ibut.InputButton(1045, 645, 55, 25, scene._screen, text=str(ft.WINDS[4][2]))
+
+    # buttons for wind strength
+    ws_buttons = {}
+    ws_buttons["minus"] = ibut.InputButton(1050, 725, 20, 20, scene._screen, text="-", blink=True)
+    ws_buttons["plus"] = ibut.InputButton(1120, 725, 20, 20, scene._screen, text="+", blink=True)
 
     # Main loop
     while done == False:
@@ -145,6 +150,8 @@ if __name__ == '__main__':
         for box in input_boxes.values():
             box.draw()
         for but in wind_buttons.values():
+            but.draw()
+        for but in ws_buttons.values():
             but.draw()
         pygame.display.flip()
 
@@ -162,9 +169,10 @@ if __name__ == '__main__':
 
             for box in input_boxes.values():
                 box.handle_event(event)
-
             for but in wind_buttons.values():
                 but.handle_event(event, wind_buttons)
+            for but in ws_buttons.values():
+                but.handle_event(event, ws_buttons)
 
         
         for box in input_boxes.values():
