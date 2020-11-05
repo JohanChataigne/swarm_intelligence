@@ -17,6 +17,9 @@ __colors__ = [(255,255,255),(0,255,0),(0, 86, 27),(255,140,0)]
 lightning = 0.0000 #Probability of lightning
 new_growth = 0.002 #Probability of new growth
 tree_ratio = 0.50 #Tree rate in the space
+river = true
+lakes = 0
+
 
 # Map winds with their opposite direction (sense, direction, label)
 winds = {
@@ -53,6 +56,7 @@ WIND_STRENGTH = 0
         5.  An old tree takes 2 steps to burn.
         6.  Fire can only spread in the wind's direction (North = 1, East = 2, South = 3, West = 4).
         7.  The fire spreads further if the wind is stronger
+        8   Water stops fire, except if the wind is strong enough...
 
 '''
 
@@ -75,8 +79,6 @@ class Grid:
     _indexVoisins = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
     
     def __init__(self, empty=True):
-        
-        #print("Creating grid of dimensions " + str(__gridDim__))
         
         if empty:
             self._grid = np.zeros(__gridDim__, dtype='int8')
@@ -322,7 +324,40 @@ class Scene:
         self._forest.update()
 
 
+# Try to cast 'try_val' with cast() and assign it to var, or 'except_val' if it fails
+def try_except_cast(try_val, except_val, cast):
+    try:
+        ret = cast(try_val)
+    except ValueError:
+        ret = except_val
+    
+    return ret
+        
+# Updates the wind according to the UI  
+def update_wind(buttons, inputs):
+    global WIND
+    global WIND_STRENGTH
+    
+    # List of the states of each wind button
+    states = [button.active for button in buttons.values()]
+    
+    # Check which button is active and update win accordingly
+    for index, state in enumerate(states):
+        
+        if state:
+            WIND = index
+            if index != 0:
+                if WIND_STRENGTH == 0:
+                    WIND_STRENGTH = 1
+            else:
+                WIND_STRENGTH = 0
+
+            inputs["wind_strength"].updateText(str(WIND_STRENGTH))
+            return
+
+
 if __name__ == '__main__':
+
     scene = Scene()
     done = False
     clock = pygame.time.Clock()
@@ -374,67 +409,16 @@ if __name__ == '__main__':
         
         for box in input_boxes.values():
            box.update()
-            
-        try:
-            lightning = float(input_boxes["lightning"].text)/100
-        except ValueError:
-            lightning = 0
-
-        try:
-            new_growth = float(input_boxes["new_growth"].text)/100
-        except ValueError:
-            new_growth = 0
-
-        try:
-            WIND_STRENGTH = int(input_boxes["wind_strength"].text) 
-        except ValueError:
-            WIND_STRENGTH = -1
-
-        # Check which wind button is active and update the wind parameters accordingly
-        # North button
-        if wind_buttons["north"].active:
-            WIND = 1
-            if WIND_STRENGTH == 0:
-                WIND_STRENGTH = 1
-                input_boxes["wind_strength"].updateText(str(WIND_STRENGTH))
-            
         
-        # East button
-        elif wind_buttons["east"].active:
-            WIND = 2
-            if WIND_STRENGTH == 0:
-                WIND_STRENGTH = 1
-                input_boxes["wind_strength"].updateText(str(WIND_STRENGTH))
-
-        # South button
-        elif wind_buttons["south"].active:
-            WIND = 3
-            if WIND_STRENGTH == 0:
-                WIND_STRENGTH = 1
-                input_boxes["wind_strength"].updateText(str(WIND_STRENGTH))
-
-        # West button
-        elif wind_buttons["west"].active:
-            WIND = 4
-            if WIND_STRENGTH == 0:
-                WIND_STRENGTH = 1
-                input_boxes["wind_strength"].updateText(str(WIND_STRENGTH))
-        
-        # None button
-        elif wind_buttons["none"].active:
-            WIND = 0
-            WIND_STRENGTH = 0
-            input_boxes["wind_strength"].updateText(str(WIND_STRENGTH))
-        
-        else:
-            WIND = 0
-            WIND_STRENGTH = 0
-            input_boxes["wind_strength"].updateText(str(WIND_STRENGTH))
-
+        # Convert input we get from the UI
+        lightning = try_except_cast(input_boxes["lightning"].text, 0, float) / 100
+        new_growth = try_except_cast(input_boxes["new_growth"].text, 0, float) / 100
+        WIND_STRENGTH = try_except_cast(input_boxes["wind_strength"].text, -1, int)
+       
+        # Check which wind button is active and update the wind parameters accordingly     
+        update_wind(wind_buttons, input_boxes)
 
     pygame.quit()
-
-#if not sys.flags.interactive: main() 
         
         
         
