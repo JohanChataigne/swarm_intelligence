@@ -8,13 +8,14 @@ FONT = pg.font.Font(None, 32)
 
 class InputBox:
 
-    def __init__(self, x, y, w, h, screen, text=''):
+    def __init__(self, x, y, w, h, screen, text='', min_width=100):
         self.rect = pg.Rect(x, y, w, h)
         self.color = COLOR_INACTIVE
         self.text = text
         self.txt_surface = FONT.render(text, True, self.color)
         self.active = False
         self.screen = screen
+        self.min_width = min_width
 
     def updateText(self, text):
         self.text = text
@@ -30,6 +31,7 @@ class InputBox:
                 self.active = False
             # Change the current color of the input box.
             self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
+
         if event.type == pg.KEYDOWN:
             if self.active:
                 if event.key == pg.K_RETURN:
@@ -44,8 +46,8 @@ class InputBox:
                 
     def update(self):
         # Resize the box if the text is too long.
-        width = max(200, self.txt_surface.get_width()+10)
-        self.rect.w = width
+        # width = max(200, )
+        self.rect.w = max(self.min_width, self.txt_surface.get_width()+10)
 
     def draw(self):
         # Blit the text.
