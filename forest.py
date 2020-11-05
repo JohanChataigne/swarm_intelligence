@@ -2,8 +2,6 @@ import sys, math, random
 import pygame
 import pygame.draw
 import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
 import input_box as ibox
 import input_button as ibut
 
@@ -11,11 +9,12 @@ __screenSize__ = (1250,900)
 __gridSize__ = (900,900) 
 __cellSize__ = 10 
 __gridDim__ = tuple(map(lambda x: int(x/__cellSize__), __gridSize__))
+nx, ny = __gridDim__
 __clock_tick__ = 2
 
 __colors__ = [(255,255,255),(0,255,0),(0, 86, 27),(255,140,0)]
 
-lightning = 0.00002 #Probability of lightning
+lightning = 0.0000 #Probability of lightning
 new_growth = 0.002 #Probability of new growth
 tree_ratio = 0.50 #Tree rate in the space
 
@@ -83,21 +82,20 @@ class Grid:
             self._grid = np.zeros(__gridDim__, dtype='int8')
             self._gridbis = np.zeros(__gridDim__, dtype='int8')
         else:
-            size = __gridDim__[0] * __gridDim__[1]
+            size = nx * ny
             self._grid = np.ones(size, dtype='int8')
             self._grid[:int((1-tree_ratio)*size)] = 0
             np.random.shuffle(self._grid)
-            self._gridbis = np.reshape(self._grid, (__gridDim__[0], __gridDim__[1]))
-            self._grid = np.reshape(self._grid, (__gridDim__[0], __gridDim__[1]))
+            self._gridbis = np.reshape(self._grid, (nx, ny))
+            self._grid = np.reshape(self._grid, (nx, ny))
         
         assert (np.array_equal(self._grid, self._gridbis))
-        nx, ny = __gridDim__
 
     def resetIndexVoisins(self):
         self._indexVoisins = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
 
     def indiceVoisins(self, x,y):
-        return [(dx+x,dy+y) for (dx,dy) in self._indexVoisins if dx+x >=0 and dx+x < __gridDim__[0] and dy+y>=0 and dy+y < __gridDim__[1]] 
+        return [(dx+x,dy+y) for (dx,dy) in self._indexVoisins if dx+x >=0 and dx+x < nx and dy+y>=0 and dy+y < ny] 
 
     def voisins(self,x,y):
         return [self._gridbis[vx,vy] for (vx,vy) in self.indiceVoisins(x,y)]
@@ -142,11 +140,15 @@ class Grid:
 
 class Forest:
 
+    # Grids
     _trees = None
     _burning = None
-    _empties = None
+    
+    # Element counts
     _old = None
     _young = None
+    _init = None
+    _empties = None
     _burnt = None
     
     def __init__(self, gridTrees, gridBurning):
@@ -155,11 +157,24 @@ class Forest:
         self._trees = gridTrees
         self._burning = gridBurning
         
-        # Counts 
-        self._burnt = 0
+        # Element counts 
         self._old = 0
-        self._young = __gridDim__[0] * __gridDim__[1] * tree_ratio
-        self._empties = __gridDim__[0] * __gridDim__[1] * (1-tree_ratio)
+        self._young = nx * ny * tree_ratio
+        self._init = self._young
+        self._empties = nx * ny * (1-tree_ratio)
+
+        # If no lightning probability, one tree ignites at the beginning (usefull for percolation)
+        if lightning == 0:
+            bx = random.randint(0, nx - 1)
+            by = random.randint(0, ny - 1)
+            while self._trees[bx, by] == 0:
+                bx = random.randint(0, nx - 1)
+                by = random.randint(0, ny - 1)
+            self._burning[bx, by] = 1
+            self._burning._gridbis[bx, by] = 1
+            self._burnt = 1
+        else:
+            self._burnt = 0
         
     # Get state of a tree i.e (tree?, burning?)
     def getTree(self, x, y):
@@ -223,8 +238,8 @@ class Forest:
     # Update forest
     def update(self):
         
-        for x in range(__gridDim__[0]):
-            for y in range(__gridDim__[1]):
+        for x in range(nx):
+            for y in range(ny):
                 
                 cell = self.getTree(x, y)
                 
@@ -264,8 +279,8 @@ class Scene:
         if self._forest._trees is None or self._forest._burning is None:
             return
         self._screen.fill((255,255,255))
-        for x in range(__gridDim__[0]):
-            for y in range(__gridDim__[1]):
+        for x in range(nx):
+            for y in range(ny):
                 pygame.draw.rect(self._screen, 
                         getColorCell(self._forest.getTree(x,y)),
                         (x*__cellSize__ + 1, y*__cellSize__ + 1, __cellSize__-2, __cellSize__-2))
@@ -275,7 +290,7 @@ class Scene:
         self._screen.blit(self._font.render(text,1,color),position)
     
     def drawLegend(self):
-        total = __gridDim__[0] * __gridDim__[1] 
+        total = nx * ny 
 
         # Legend
         pygame.draw.line(self._screen, (0, 0, 0), (900, 0), (900, 1200), width=2)
@@ -307,15 +322,10 @@ class Scene:
         self._forest.update()
 
 
-def main():
+if __name__ == '__main__':
     scene = Scene()
     done = False
     clock = pygame.time.Clock()
-
-    global lightning
-    global new_growth
-    global WIND
-    global WIND_STRENGTH
 
     # input boxes for parameters
     input_boxes = {}
@@ -424,7 +434,7 @@ def main():
 
     pygame.quit()
 
-if not sys.flags.interactive: main() 
+#if not sys.flags.interactive: main() 
         
         
         
