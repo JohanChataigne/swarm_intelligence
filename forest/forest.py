@@ -4,6 +4,7 @@ import random
 # Globals
 
 # Problem parmeters
+IGNITE = 2
 LIGHTNING = 0.00002 #Probability of lightning
 NEW_GROWTH = 0.002 #Probability of new growth
 TREE_RATIO = 0.50 #Tree rate in the space
@@ -23,6 +24,7 @@ WINDS = {
 WIND = 0
 # Wind strength (0-3)
 WIND_STRENGTH = 0
+WIND_MAX = 3
 
 '''
                     Forest Fire
@@ -103,7 +105,9 @@ class Forest:
             neighbours = self._burning.voisins(x, y)
 
         # Case at least one neighbour is burning
-        if 1 in neighbours:
+        ignite_prob = IGNITE * sum(neighbours) * 1.0/len(neighbours)
+        rnd_ignite = random.random()
+        if rnd_ignite < ignite_prob:
             self._burning[x, y] = 1
             self._burnt += 1
 
