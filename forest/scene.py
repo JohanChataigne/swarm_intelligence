@@ -11,7 +11,7 @@ import forest as ft
 
 __clock_tick__ = 2
 __colors__ = [(255,255,255),(0,255,0),(255,165,0)]
-__screenSize__ = (1250,800)
+__screenSize__ = (1250,900)
 WATER_COLOR = (50, 50, 255)
 
 

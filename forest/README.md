@@ -2,16 +2,13 @@
 
 ## Introduction
 
-Forest Fire
+![Forest fire simulation with pygame][./images/screen.png]
 
 ### Planes
 
-Plane 0 indicates the presence of a tree:
-1 = tree, 0 = empty, 2-10 = old tree
-Plane 1 indicates whether a tree is burning:
-1 = burning, 0 = not burning, 2-10 = burning time (just visual data)
-Plane 2 indicates the presence of water:
-1 = water, 0 = empty
+Plane 0 indicates the presence of a tree: 1 = tree, 0 = empty, 2-10 = old tree  
+Plane 1 indicates whether a tree is burning: 1 = burning, 0 = not burning, 2-10 = burning time (just visual data)  
+Plane 2 indicates the presence of water: 1 = water, 0 = empty  
 
 The forest is initialized with 'tree_ratio'% of the space occupied by trees of random age.
 
