@@ -66,8 +66,22 @@ class Scene:
         # Legend
         pygame.draw.line(self._screen, (0, 0, 0), (900, 0), (900, 1200), width=2)
         
-        self.drawElement("Tree", self._forest._tree, total, 920, 100, 20, 20, __colors__[1])
-        self.drawElement("Burning tree", self._forest._burnt, total, 920, 140, 20, 20, __colors__[2])
+        # Black borders
+        pygame.draw.rect(self._screen, (0, 0, 0), (920, 100, 20, 20), 3)
+        pygame.draw.rect(self._screen, (0, 0, 0), (920, 140, 20, 20), 3)
+        
+        # Color shades
+        for i in range(10):
+            # Green shades for trees
+            pygame.draw.rect(self._screen, (0, 255 - (i * 155 / 9), 0), (920, 100+2*i, 20, 2))
+            # Orange shades for fires
+            pygame.draw.rect(self._screen, (255, 165 - (i * 96 / 9), 0), (920, 140+2*i, 20, 2))
+        
+        # Text en measures
+        self.drawText("Trees (" + str(int(self._forest._tree)) + " / " + str(np.round(1.*self._forest._tree/total * 100, 2)) + "%)", (960, 100))
+        self.drawText("Burning trees (" + str(int(self._forest._burnt)) + " / " + str(np.round(1.*self._forest._burnt/total * 100, 2)) + "%)", (960, 140))
+        
+        # Legend for empty cells
         self.drawElement("Empty cell", self._forest._empties, total, 920, 180, 20, 20, __colors__[0])
         
         # Parameters
