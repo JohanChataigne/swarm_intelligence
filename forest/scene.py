@@ -10,13 +10,13 @@ import forest as ft
 # Globals
 
 __clock_tick__ = 2
-__colors__ = [(255,255,255),(0,255,0),(255,165,0)]
 __screenSize__ = (1250,900)
 WATER_COLOR = (50, 50, 255)
+EMPTY_COLOR = (255,255,255)
 
 
 # Get the right color for a given cell
-def getColorCell(n):
+def getColorCell(n: tuple) -> tuple:
     if n[2]:
         return WATER_COLOR
     elif n[0]:
@@ -30,7 +30,7 @@ def getColorCell(n):
             return (0, green, 0)
     else:
         # Empty cell
-        return __colors__[0]
+        return EMPTY_COLOR
 
 
 class Scene:
@@ -55,16 +55,16 @@ class Scene:
                 color = getColorCell(self._forest.getCell(x,y))
                 if color == WATER_COLOR:
                     pygame.draw.rect(self._screen, color, 
-                                        (x*ft.gr.__cellSize__ - 4, y*ft.gr.__cellSize__ - 4, ft.gr.__cellSize__, ft.gr.__cellSize__))
+                                        (x*ft.gr.__cellSize__, y*ft.gr.__cellSize__, ft.gr.__cellSize__, ft.gr.__cellSize__))
                 else:                    
                     pygame.draw.circle(self._screen, color, 
-                                        (x*ft.gr.__cellSize__ + 1, y*ft.gr.__cellSize__ + 1), ft.gr.__cellSize__/2)
+                                        (x*ft.gr.__cellSize__ + 5, y*ft.gr.__cellSize__ + 5), ft.gr.__cellSize__/2)
 
 
-    def drawText(self, text, position, color = (0,0,0)):
+    def drawText(self, text: str, position: tuple, color = (0,0,0)):
         self._screen.blit(self._font.render(text,1,color),position)
 
-    def drawElement(self, name, elem, total, x, y, w, h, color):
+    def drawElement(self, name: str, elem, total: int, x: int, y: int, w: int, h: int, color: tuple):
         pygame.draw.rect(self._screen, color, (x, y, w, h))
         pygame.draw.rect(self._screen, (0, 0, 0), (x, y, w, h), 2)
         self.drawText(name + " (" + str(int(elem)) + " / " + str(np.round(1.*elem/total * 100, 2)) + "%)", (x + 40, y))
@@ -73,7 +73,7 @@ class Scene:
         total = ft.gr.nx * ft.gr.ny 
 
         # Legend
-        pygame.draw.line(self._screen, (0, 0, 0), (900, 0), (900, 1200), width=2)
+        pygame.draw.line(self._screen, (0, 0, 0), (900, 0), (900, 1200), width=3)
             
         # Color shades
         for i in range(10):
@@ -91,7 +91,7 @@ class Scene:
         self.drawText("Burning trees (" + str(int(self._forest._burnt)) + " / " + str(np.round(1.*self._forest._burnt/total * 100, 2)) + "%)", (960, 140))
         
         # Legend for empty cells
-        self.drawElement("Empty cell", self._forest._empties, total, 920, 180, 20, 20, __colors__[0])
+        self.drawElement("Empty cell", self._forest._empties, total, 920, 180, 20, 20, EMPTY_COLOR)
         pygame.draw.rect(self._screen, (50, 50, 255), (920, 220, 20, 20))
         pygame.draw.rect(self._screen, (0, 0, 0), (920, 220, 20, 20), 2)
         self.drawText("Water", (960, 220))
@@ -108,7 +108,7 @@ class Scene:
 
         
 # Try to cast 'try_val' with cast() and assign it to var, or 'except_val' if it fails
-def try_except_cast(try_val, except_val, cast):
+def try_except_cast(try_val: str, except_val, cast):
     try:
         ret = cast(try_val)
     except ValueError:
@@ -117,7 +117,7 @@ def try_except_cast(try_val, except_val, cast):
     return ret
 
 # Updates the wind according to the UI  
-def update_wind_dir(buttons, inputs):
+def update_wind_dir(buttons: dict, inputs: dict):
     
     # List of the states of each wind button
     states = [button.active for button in buttons.values()]
@@ -137,7 +137,7 @@ def update_wind_dir(buttons, inputs):
             return
 
 # Updates the wind according to the UI  
-def update_wind_strength(ws_buttons, ws_box, wind_buttons):
+def update_wind_strength(ws_buttons: dict, ws_box, wind_buttons: dict):
 
     if ft.WIND != 0:
 

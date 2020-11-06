@@ -63,13 +63,14 @@ class Grid:
     def resetIndexVoisins(self):
         self._indexVoisins = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
 
-    def indiceVoisins(self, x,y):
+    def indiceVoisins(self, x: int, y: int) -> list:
         return [(dx+x,dy+y) for (dx,dy) in self._indexVoisins if dx+x >=0 and dx+x < __gridDim__[0] and dy+y>=0 and dy+y < __gridDim__[1]] 
 
-    def voisins(self,x,y):
+    def voisins(self,x: int, y: int) -> list:
         return [self._gridbis[vx,vy] for (vx,vy) in self.indiceVoisins(x,y)]
     
-    def furtherNeighbours(self, x, y, ws):
+    # Returns the list of neighbours of the cell (x, y) depending on the wind strength ws
+    def furtherNeighbours(self, x: int, y: int, ws: int) -> list:
         neighbours = self.indiceVoisins(x, y)
         further_neighbours = neighbours.copy()
         
@@ -77,17 +78,16 @@ class Grid:
             tmp_neighbours = [self.indiceVoisins(xbis, ybis) for (xbis, ybis) in neighbours]
             tmp_neighbours = sum(tmp_neighbours, []) #Flatten the list 
             further_neighbours += tmp_neighbours
-            further_neighbours = list(set(further_neighbours)) #Uniq values
+            further_neighbours = list(set(further_neighbours)) #Unique values
             neighbours = tmp_neighbours.copy()
             
-
         return [self._gridbis[vx, vy] for (vx, vy) in further_neighbours]
  
    
-    def sommeVoisins(self, x, y):
+    def sommeVoisins(self, x: int, y: int) -> int:
         return sum(self.voisins(x,y))
 
-    def sumEnumerate(self):
+    def sumEnumerate(self) -> list:
         return [(c, self.sommeVoisins(c[0], c[1])) for c, _ in np.ndenumerate(self._grid)]
 
     def drawMe(self):
@@ -96,8 +96,8 @@ class Grid:
     def updateBis(self):
         self._gridbis = np.copy(self._grid)
     
-    def __getitem__(self, key):
+    def __getitem__(self, key: tuple):
         return self._grid[key[0], key[1]]
     
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: tuple, value: int):
         self._grid[key[0], key[1]] = value
