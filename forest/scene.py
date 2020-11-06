@@ -58,7 +58,7 @@ class Scene:
 
     def drawElement(self, name, elem, total, x, y, w, h, color):
         pygame.draw.rect(self._screen, color, (x, y, w, h))
-        pygame.draw.rect(self._screen, (0, 0, 0), (x, y, w, h), 3)
+        pygame.draw.rect(self._screen, (0, 0, 0), (x, y, w, h), 2)
         self.drawText(name + " (" + str(int(elem)) + " / " + str(np.round(1.*elem/total * 100, 2)) + "%)", (x + 40, y))
     
     def drawLegend(self):
@@ -66,17 +66,17 @@ class Scene:
 
         # Legend
         pygame.draw.line(self._screen, (0, 0, 0), (900, 0), (900, 1200), width=2)
-        
-        # Black borders
-        pygame.draw.rect(self._screen, (0, 0, 0), (920, 100, 20, 20), 3)
-        pygame.draw.rect(self._screen, (0, 0, 0), (920, 140, 20, 20), 3)
-        
+            
         # Color shades
         for i in range(10):
             # Green shades for trees
             pygame.draw.rect(self._screen, (0, 255 - (i * 155 / 9), 0), (920, 100+2*i, 20, 2))
             # Orange shades for fires
             pygame.draw.rect(self._screen, (255, 165 - (i * 96 / 9), 0), (920, 140+2*i, 20, 2))
+
+        # Black borders
+        pygame.draw.rect(self._screen, (0, 0, 0), (920, 100, 20, 20), 2)
+        pygame.draw.rect(self._screen, (0, 0, 0), (920, 140, 20, 20), 2)
         
         # Text en measures
         self.drawText("Trees (" + str(int(self._forest._tree)) + " / " + str(np.round(1.*self._forest._tree/total * 100, 2)) + "%)", (960, 100))
@@ -90,7 +90,7 @@ class Scene:
         self.drawText("Lightning probability (%): ", (920, 500))
         self.drawText("Growth probability (%):", (920, 560))
         self.drawText("Wind direction: ", (920, 645))
-        self.drawText("Wind strength: ", (920, 720))
+        self.drawText("Wind strength [0-" + str(ft.WIND_MAX) + "]:" , (920, 722))
         
     def update(self):
         self._forest.update()
@@ -126,19 +126,22 @@ def update_wind_dir(buttons, inputs):
             return
 
 # Updates the wind according to the UI  
-def update_wind_strength(ws_buttons, ws_box):
+def update_wind_strength(ws_buttons, ws_box, wind_buttons):
 
     if ft.WIND != 0:
 
         for key in ws_buttons.keys():
 
             if ws_buttons[key].active:
-                if key == "minus" and ft.WIND_STRENGTH > 1:
+                if key == "minus" and ft.WIND_STRENGTH > 0:
                     ft.WIND_STRENGTH -= 1
+                    if ft.WIND_STRENGTH == 0:
+                        wind_buttons["none"].activate(wind_buttons)
                 elif key == "plus" and ft.WIND_STRENGTH < ft.WIND_MAX:
                     ft.WIND_STRENGTH += 1
 
                 ws_box.updateText(str(ft.WIND_STRENGTH))
+
         
 
 if __name__ == '__main__':
@@ -151,7 +154,7 @@ if __name__ == '__main__':
     input_boxes = {}
     input_boxes["lightning"] = ibox.InputBox(920, 525, 100, 30, scene._screen, text=str(ft.LIGHTNING * 100))
     input_boxes["new_growth"] = ibox.InputBox(920, 585, 100, 30, scene._screen, text=str(ft.NEW_GROWTH * 100))
-    input_boxes["wind_strength"] = ibox.InputBox(1080, 720, 25, 30, scene._screen, text=str(ft.WIND_STRENGTH), min_width=25, writeable=False)
+    input_boxes["wind_strength"] = ibox.InputBox(1110, 720, 25, 30, scene._screen, text=str(ft.WIND_STRENGTH), min_width=25, writeable=False)
 
     # buttons for wind direction
     wind_buttons = {}
@@ -163,8 +166,8 @@ if __name__ == '__main__':
 
     # buttons for wind strength
     ws_buttons = {}
-    ws_buttons["minus"] = ibut.InputButton(1050, 725, 20, 20, scene._screen, text="-", blink=True)
-    ws_buttons["plus"] = ibut.InputButton(1115, 725, 20, 20, scene._screen, text="+", blink=True)
+    ws_buttons["minus"] = ibut.InputButton(1080, 725, 20, 20, scene._screen, text="-", blink=True)
+    ws_buttons["plus"] = ibut.InputButton(1145, 725, 20, 20, scene._screen, text="+", blink=True)
 
     # Main loop
     while done == False:
@@ -210,7 +213,7 @@ if __name__ == '__main__':
        
         # Check which wind button is active and update the wind parameters accordingly     
         update_wind_dir(wind_buttons, input_boxes)
-        update_wind_strength(ws_buttons, input_boxes["wind_strength"])
+        update_wind_strength(ws_buttons, input_boxes["wind_strength"], wind_buttons)
 
     pygame.quit()
         
