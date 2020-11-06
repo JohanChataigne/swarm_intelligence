@@ -39,7 +39,7 @@ class Scene:
         pygame.init()
         self._screen = pygame.display.set_mode(__screenSize__)
         self._font = pygame.font.SysFont('Arial',20)
-        self._forest = ft.Forest(ft.gr.Grid(empty=False, ratio=ft.TREE_RATIO), ft.gr.Grid())
+        self._forest = ft.Forest()
 
     # Metho drawing actual forest simulation on the scene 
     def drawMe(self):
