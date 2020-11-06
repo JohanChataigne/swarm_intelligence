@@ -4,7 +4,7 @@ import random
 # Globals
 
 # Problem parmeters
-IGNITE = 2
+IGNITE = 1
 LIGHTNING = 0.00002 #Probability of lightning
 NEW_GROWTH = 0.002 #Probability of new growth
 TREE_RATIO = 0.50 #Tree rate in the space
