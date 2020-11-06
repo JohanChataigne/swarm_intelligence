@@ -28,7 +28,6 @@ class Grid:
             y0 = np.random.randint(25, 66)
             
             for x in range(nx):
-                #for y in range(y0 - river_width//2, y0 + river_width//2 + 1):
                 for y in range(river_width):
 
                     if river == "line":

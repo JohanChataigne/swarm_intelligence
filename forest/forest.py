@@ -9,7 +9,7 @@ LIGHTNING = 0.00002 #Probability of lightning
 NEW_GROWTH = 0.002 #Probability of new growth
 TREE_RATIO = 0.50 #Tree rate in the space
 TREE_MAX_AGE = 10
-RIVER = "line" # Shape of the river (line, sin)
+RIVER = "sin" # Shape of the river (line, sin)
 RIVER_WIDTH = 2
 LAKES = 0
 
