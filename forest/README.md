@@ -2,7 +2,7 @@
 
 ## Introduction
 
-![Forest fire simulation with pygame][images/screen.png]
+![Forest fire simulation with pygame](images/screen.png)
 
 ### Planes
 
