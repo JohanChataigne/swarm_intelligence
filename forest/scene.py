@@ -12,7 +12,7 @@ import forest as ft
 __clock_tick__ = 2
 __screenSize__ = (1250,900)
 WATER_COLOR = (50, 50, 255)
-EMPTY_COLOR = (255,255,255)
+COLOR_EMPTY = (255, 255, 255)
 
 
 # Get the right color for a given cell
@@ -30,8 +30,7 @@ def getColorCell(n: tuple) -> tuple:
             return (0, green, 0)
     else:
         # Empty cell
-        return EMPTY_COLOR
-
+        return COLOR_EMPTY #ft.humidity_color()
 
 class Scene:
     _mouseCoords = (0,0)
@@ -49,6 +48,8 @@ class Scene:
         if self._forest._trees is None or self._forest._burning is None:
             return
         self._screen.fill((255,255,255))
+        #pygame.draw.rect(self._screen, ft.humidity_color(), (0, 0, ft.gr.__gridSize__[0], ft.gr.__gridSize__[1]))
+
         for x in range(ft.gr.nx):
             for y in range(ft.gr.ny):
                 
@@ -56,6 +57,8 @@ class Scene:
                 if color == WATER_COLOR:
                     pygame.draw.rect(self._screen, color, 
                                         (x*ft.gr.__cellSize__, y*ft.gr.__cellSize__, ft.gr.__cellSize__, ft.gr.__cellSize__))
+                    '''pygame.draw.rect(self._screen, (0, 130, 255), 
+                                        (x*ft.gr.__cellSize__, y*ft.gr.__cellSize__, ft.gr.__cellSize__, ft.gr.__cellSize__), 1)'''
                 else:                    
                     pygame.draw.circle(self._screen, color, 
                                         (x*ft.gr.__cellSize__ + 5, y*ft.gr.__cellSize__ + 5), ft.gr.__cellSize__/2)
@@ -91,13 +94,17 @@ class Scene:
         self.drawText("Burning trees (" + str(int(self._forest._burnt)) + " / " + str(np.round(1.*self._forest._burnt/total * 100, 2)) + "%)", (960, 140))
         
         # Legend for empty cells
-        self.drawElement("Empty cell", self._forest._empties, total, 920, 180, 20, 20, EMPTY_COLOR)
+        self.drawElement("Empty cell", self._forest._empties, total, 920, 180, 20, 20, COLOR_EMPTY) #, ft.humidity_color()
         pygame.draw.rect(self._screen, (50, 50, 255), (920, 220, 20, 20))
         pygame.draw.rect(self._screen, (0, 0, 0), (920, 220, 20, 20), 2)
         self.drawText("Water", (960, 220))
         
         # Parameters
-        self.drawText("Initial tree rate: " + str(ft.TREE_RATIO*100) + "%", (920, 460))
+        self.drawText("Initial tree rate: " + str(ft.TREE_RATIO*100) + "%", (920, 400))
+
+        pygame.draw.rect(self._screen, ft.humidity_color(), (920, 440, 20, 20))
+        pygame.draw.rect(self._screen, (0, 0, 0), (920, 440, 20, 20), 2)
+        self.drawText("Humidity rate (%): ", (950, 440))
         self.drawText("Lightning probability (%): ", (920, 500))
         self.drawText("Growth probability (%):", (920, 560))
         self.drawText("Wind direction: ", (920, 645))
@@ -108,9 +115,13 @@ class Scene:
 
         
 # Try to cast 'try_val' with cast() and assign it to var, or 'except_val' if it fails
-def try_except_cast(try_val: str, except_val, cast):
+def try_except_cast(try_val: str, max_val, except_val, cast, box):
     try:
         ret = cast(try_val)
+        if ret > max_val:
+            ret = max_val
+            box.updateText(str(ret))
+
     except ValueError:
         ret = except_val
     
@@ -163,6 +174,7 @@ if __name__ == '__main__':
 
     # input boxes for parameters
     input_boxes = {}
+    input_boxes["humidity"] = ibox.InputBox(920, 465, 100, 30, scene._screen, text=str(ft.HUMIDITY * 100))
     input_boxes["lightning"] = ibox.InputBox(920, 525, 100, 30, scene._screen, text=str(ft.LIGHTNING * 100))
     input_boxes["new_growth"] = ibox.InputBox(920, 585, 100, 30, scene._screen, text=str(ft.NEW_GROWTH * 100))
     input_boxes["wind_strength"] = ibox.InputBox(1110, 720, 25, 30, scene._screen, text=str(ft.WIND_STRENGTH), min_width=25, writeable=False)
@@ -218,9 +230,10 @@ if __name__ == '__main__':
            box.update()
         
         # Convert input we get from the UI
-        ft.LIGHTNING = try_except_cast(input_boxes["lightning"].text, 0, float) / 100
-        ft.NEW_GROWTH = try_except_cast(input_boxes["new_growth"].text, 0, float) / 100
-        ft.WIND_STRENGTH = try_except_cast(input_boxes["wind_strength"].text, -1, int)
+        ft.HUMIDITY = try_except_cast(input_boxes["humidity"].text, 100, 0, float, input_boxes["humidity"]) / 100
+        ft.LIGHTNING = try_except_cast(input_boxes["lightning"].text, 100, 0, float, input_boxes["lightning"]) / 100
+        ft.NEW_GROWTH = try_except_cast(input_boxes["new_growth"].text, 100, 0, float, input_boxes["new_growth"]) / 100
+        ft.WIND_STRENGTH = try_except_cast(input_boxes["wind_strength"].text, ft.WIND_MAX, 0, int, input_boxes["wind_strength"])
        
         # Check which wind button is active and update the wind parameters accordingly     
         update_wind_dir(wind_buttons, input_boxes)

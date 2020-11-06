@@ -20,14 +20,15 @@ The forest is initialized with 'tree_ratio'% of the space occupied by trees of r
 The transition rules are as follows.
 
 1.  A fully burnt tree turns into an empty cell.
-2.  A non-burning tree with turns into a burning tree with probability depending on its number of neighbors burning.
-3.  A tree with no burning neighbour ignites with a certain probability due to lightning.
-4.  An empty space grows a new tree with a certain probability.
-5.  A tree grows older at each iteration (1-10).
-5.  The older a tree, the more steps it takes to burn.
-6.  Fire can't spread in the opposite wind's direction.
-7.  The stronger the wind, the further the fire can spread.
-8.  Trees can't grow in water: water stops fire, except if the wind is strong enough.
+2.  A non-burning tree can turn into a burning tree with probability depending on its number of neighbors burning and humidity rate.
+3.  A burning tree can stop burning depending on the humidity rate.
+4.  A tree with no burning neighbour ignites with a certain probability due to lightning.
+5.  An empty space grows a new tree with a certain probability depending on the humidity rate.
+6.  A tree grows older at each iteration (1-10).
+7.  The older a tree, the more steps it takes to burn.
+8.  Fire can't spread in the opposite wind's direction.
+9.  The stronger the wind, the further the fire can spread.
+10.  Trees can't grow in water: water stops fire, except if the wind is strong enough.
 
 ## Files and folders
 

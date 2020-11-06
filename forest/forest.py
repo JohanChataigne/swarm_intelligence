@@ -4,7 +4,7 @@ import random
 # Globals
 
 # Problem parmeters
-IGNITE = 1
+HUMIDITY = 0
 LIGHTNING = 0.00002 #Probability of lightning
 NEW_GROWTH = 0.002 #Probability of new growth
 TREE_RATIO = 0.50 #Tree rate in the space
@@ -52,6 +52,12 @@ WIND_MAX = 3
         8   Water stops fire, except if the wind is strong enough...
 
 '''
+
+def humidity_color():
+    if HUMIDITY < 0.5:
+        return (255, 255, int(HUMIDITY * 255))
+    else:
+        return (int(255 * (1 - HUMIDITY)), 255, 255)
  
 class Forest:
 
@@ -90,7 +96,8 @@ class Forest:
             self._burnt = 1
         else:
             self._burnt = 0
-        
+
+     
     # Get state of a cell i.e (tree?, burning?, water?)
     def getCell(self, x: int, y: int) -> tuple:
         return (self._trees._gridbis[x, y], self._burning._gridbis[x, y], self._water._gridbis[x, y])
@@ -98,6 +105,7 @@ class Forest:
     # Tree igniting treatment
     def ignite_grow(self, x: int, y: int):
 
+        # Computes the neighbours of the cell (x, y) depending on the wind
         self._burning.resetIndexVoisins()
         if WIND > 0 and WIND_STRENGTH > 0:
             v = WINDS[WIND]
@@ -107,47 +115,60 @@ class Forest:
         else:
             neighbours = self._burning.voisins(x, y)
 
-        # Case at least one neighbour is burning
-        ignite_prob = IGNITE * sum(neighbours) * 1.0/len(neighbours)
+        # Ignites with a probability that depends on the number of neighbours burning and the humidity rate
+        ignite_prob = (1 - HUMIDITY) * sum(neighbours) * 1.0/len(neighbours)
         rnd_ignite = random.random()
         if rnd_ignite < ignite_prob:
             self._burning[x, y] = 1
             self._burnt += 1
 
-        # Ignite due to lightning
-        else:           
+        else:          
+            # Ignites due to lightning with a certain probability 
             rnd_ignite = random.random()
             if rnd_ignite <= LIGHTNING: 
                 self._burning[x, y] = 1 
                 self._burnt += 1
             else: 
                 self._burning[x, y] = 0
-                
+                # Grows older if not at max age yet
                 if self._trees._gridbis[x, y] < TREE_MAX_AGE:
                     self._trees[x, y] += 1
     
     # Growing treatment 
     def grow(self, x: int, y: int):
+        # A new tree grows from empty cell with a probability depending on humidity rate
         rnd_growth = random.random()
-        if rnd_growth <= NEW_GROWTH: 
+        if rnd_growth <= NEW_GROWTH * (1 + HUMIDITY): 
             self._trees[x, y] = 1 
             self._tree += 1
             self._empties -= 1
     
-    # Make a tree die (reset cell) or make it grow if its strong enough
-    def die(self, x: int, y: int):
-        # Tree is not fully burnt
-        if self._trees._gridbis[x, y] > 1:
-            self._trees[x, y] -= 1
-            self._burning[x, y] += 1
-        
-        # Tree dies from burning
+    # Treatment for a burning tree: can stop burning, continue or die
+    def burning_treatment(self, x: int, y: int):
+
+        # Stops burning depending on the humidity rate
+        rnd_stop = random.random()
+        if rnd_stop <= HUMIDITY:
+            self._burning[x, y] -= int(HUMIDITY * 10)
+
+            # Stops burning
+            if self._burning[x, y] < 0:
+                self._burning[x, y] = 0
+                self._burnt -= 1
+
         else:
-            self._trees[x, y] = 0
-            self._burning[x, y] = 0
-            self._burnt -= 1
-            self._tree -= 1
-            self._empties += 1
+            # Tree is not fully burnt
+            if self._trees._gridbis[x, y] > 1:
+                self._trees[x, y] -= 1
+                self._burning[x, y] += 1
+            
+            # Tree dies from burning
+            else:
+                self._trees[x, y] = 0
+                self._burning[x, y] = 0
+                self._burnt -= 1
+                self._tree -= 1
+                self._empties += 1
     
     # Update forest
     def update(self):
@@ -160,18 +181,18 @@ class Forest:
                 # Treatment for cells not in water
                 if not cell[2]:
                 
-                    # Treatment for a cell with a tree
+                    # Treatment for a tree
                     if cell[0]:
                         
-                        # Each burning tree turns into an empty cell
+                        # Treatment for a burning tree: can stop burning, continue or die
                         if cell[1]:
-                            self.die(x, y)
+                            self.burning_treatment(x, y)
 
-                        # Otherwize update tree burning state or age(check neighbours)
+                        # Treatment for a non-burning tree: can ignite or grow older
                         else:
                             self.ignite_grow(x, y)
                     
-                    # Treatment of empty cell
+                    # Treatment for an empty cell: can grow a new tree
                     else:
                         self.grow(x, y)
         
