@@ -11,13 +11,14 @@ import forest as ft
 
 __clock_tick__ = 2
 __colors__ = [(255,255,255),(0,255,0),(255,165,0)]
-__screenSize__ = (1250,900)
+__screenSize__ = (1250,800)
+WATER_COLOR = (50, 50, 255)
 
 
 # Get the right color for a given cell
 def getColorCell(n):
     if n[2]:
-        return (50, 50, 255)
+        return WATER_COLOR
     elif n[0]:
         if n[1]:
             # Burning tree, color according to burning time
@@ -50,9 +51,14 @@ class Scene:
         self._screen.fill((255,255,255))
         for x in range(ft.gr.nx):
             for y in range(ft.gr.ny):
-                pygame.draw.rect(self._screen, 
-                        getColorCell(self._forest.getCell(x,y)),
-                        (x*ft.gr.__cellSize__ + 1, y*ft.gr.__cellSize__ + 1, ft.gr.__cellSize__-2, ft.gr.__cellSize__-2))
+                
+                color = getColorCell(self._forest.getCell(x,y))
+                if color == WATER_COLOR:
+                    pygame.draw.rect(self._screen, color, 
+                                        (x*ft.gr.__cellSize__ - 4, y*ft.gr.__cellSize__ - 4, ft.gr.__cellSize__, ft.gr.__cellSize__))
+                else:                    
+                    pygame.draw.circle(self._screen, color, 
+                                        (x*ft.gr.__cellSize__ + 1, y*ft.gr.__cellSize__ + 1), ft.gr.__cellSize__/2)
 
 
     def drawText(self, text, position, color = (0,0,0)):
