@@ -8,7 +8,7 @@ FONT = pg.font.Font(None, 32)
 
 class InputBox:
 
-    def __init__(self, x, y, w, h, screen, text='', min_width=100, writeable=True):
+    def __init__(self, x: int, y: int, w: int, h: int, screen, text='', min_width=100, writeable=True):
         self.rect = pg.Rect(x, y, w, h)
         self.color = COLOR_INACTIVE
         self.text = text
@@ -18,7 +18,7 @@ class InputBox:
         self.min_width = min_width
         self.writeable = writeable
 
-    def updateText(self, text):
+    def updateText(self, text: str):
         self.text = text
         self.txt_surface = FONT.render(self.text, True, COLOR_INACTIVE)
 

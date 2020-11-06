@@ -9,7 +9,7 @@ LIGHTNING = 0.00002 #Probability of lightning
 NEW_GROWTH = 0.002 #Probability of new growth
 TREE_RATIO = 0.50 #Tree rate in the space
 TREE_MAX_AGE = 10
-RIVER = "sin" # Shape of the river (line, sin)
+RIVER = "line" # Shape of the river (line, sin)
 RIVER_WIDTH = 2
 LAKES = 0
 
@@ -92,11 +92,11 @@ class Forest:
             self._burnt = 0
         
     # Get state of a cell i.e (tree?, burning?, water?)
-    def getCell(self, x, y):
+    def getCell(self, x: int, y: int) -> tuple:
         return (self._trees._gridbis[x, y], self._burning._gridbis[x, y], self._water._gridbis[x, y])
         
     # Tree igniting treatment
-    def ignite_grow(self, x, y):
+    def ignite_grow(self, x: int, y: int):
 
         self._burning.resetIndexVoisins()
         if WIND > 0 and WIND_STRENGTH > 0:
@@ -127,7 +127,7 @@ class Forest:
                     self._trees[x, y] += 1
     
     # Growing treatment 
-    def grow(self, x, y):
+    def grow(self, x: int, y: int):
         rnd_growth = random.random()
         if rnd_growth <= NEW_GROWTH: 
             self._trees[x, y] = 1 
@@ -135,7 +135,7 @@ class Forest:
             self._empties -= 1
     
     # Make a tree die (reset cell) or make it grow if its strong enough
-    def die(self, x, y):
+    def die(self, x: int, y: int):
         # Tree is not fully burnt
         if self._trees._gridbis[x, y] > 1:
             self._trees[x, y] -= 1

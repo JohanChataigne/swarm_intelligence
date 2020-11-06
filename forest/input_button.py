@@ -9,7 +9,7 @@ FONT = pg.font.Font(None, 25)
 
 class InputButton:
 
-    def __init__(self, x, y, w, h, screen, text='', active=False, blink=False):
+    def __init__(self, x: int, y: int, w: int, h: int, screen, text='', active=False, blink=False):
         self.rect = pg.Rect(x, y, w, h)
         self.color = COLOR_INACTIVE
         self.screen = screen
