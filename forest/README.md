@@ -1,4 +1,5 @@
 # Forest Fire project
+Authors: [Germon Paul](https://github.com/pgermon) and [Chataigner Johan](https://github.com/JohanChataigne)
 
 ## Introduction
 
