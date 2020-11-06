@@ -9,7 +9,7 @@ import forest as ft
 
 # Globals
 __clock_tick__ = 2
-__colors__ = [(255,255,255),(0,255,0),(0, 86, 27),(255,140,0)]
+__colors__ = [(255,255,255),(0,255,0),(255,140,0)]
 __screenSize__ = (1250,900)
 
 
@@ -18,10 +18,12 @@ def getColorCell(n):
     if n[0]:
         if n[1]:
             # Burning tree
-            return __colors__[3]
+            return __colors__[2]
         else:
             # Color according to the tree's age
-            return __colors__[n[0]]
+            green = 255 - (n[0] * 155 / 9)
+            print(green)
+            return (0, green, 0)
     else:
         # Empty cell
         return __colors__[0]
@@ -64,10 +66,9 @@ class Scene:
         # Legend
         pygame.draw.line(self._screen, (0, 0, 0), (900, 0), (900, 1200), width=2)
         
-        self.drawElement("Old tree", self._forest._old, total, 920, 100, 20, 20, __colors__[2])
-        self.drawElement("Young tree", self._forest._young, total, 920, 140, 20, 20, __colors__[1])
-        self.drawElement("Burning tree", self._forest._burnt, total, 920, 180, 20, 20, __colors__[3])
-        self.drawElement("Empty cell", self._forest._empties, total, 920, 220, 20, 20, __colors__[0])
+        self.drawElement("Tree", self._forest._tree, total, 920, 100, 20, 20, __colors__[1])
+        self.drawElement("Burning tree", self._forest._burnt, total, 920, 140, 20, 20, __colors__[2])
+        self.drawElement("Empty cell", self._forest._empties, total, 920, 180, 20, 20, __colors__[0])
         
         # Parameters
         self.drawText("Initial tree rate: " + str(ft.TREE_RATIO*100) + "%", (920, 460))

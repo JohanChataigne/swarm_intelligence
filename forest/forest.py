@@ -28,7 +28,7 @@ WIND_STRENGTH = 0
                     Forest Fire
 
         Plane 0 indicates the presence of a tree:
-            1 = tree, 0 = empty, 2 = old tree
+            1 = tree, 0 = empty, 2-10 = old tree
         Plane 1 indicates whether a tree is burning:
             1 = burning, 0 = not burning
 
@@ -42,7 +42,7 @@ WIND_STRENGTH = 0
         3.  A tree with no burning neighbour ignites with
             probability 'lightning' due to lightning.
         4.  An empty space grows a new tree with probability 'new_growth'.
-        5.  An old tree takes 2 steps to burn.
+        5.  An old tree takes more steps to burn. (1 per year)
         6.  Fire can only spread in the wind's direction (North = 1, East = 2, South = 3, West = 4).
         7.  The fire spreads further if the wind is stronger
         8   Water stops fire, except if the wind is strong enough...
@@ -54,24 +54,23 @@ class Forest:
     # Grids
     _trees = None
     _burning = None
+    _water = None
     
     # Element counts
-    _old = None
-    _young = None
+    _tree = None
     _init = None
     _empties = None
     _burnt = None
     
-    def __init__(self, gridTrees, gridBurning):
+    def __init__(self, gridTrees, gridBurning):#, gridWater):
         
         # Grids needed to store burning and tree states of cells
         self._trees = gridTrees
         self._burning = gridBurning
+        #self._water = gridWater
         
         # Element counts 
-        self._old = 0
-        self._young = gr.nx * gr.ny * TREE_RATIO
-        self._init = self._young
+        self._tree = gr.nx * gr.ny * TREE_RATIO
         self._empties = gr.nx * gr.ny * (1-TREE_RATIO)
 
         # If no lightning probability, one tree ignites at the beginning (usefull for percolation)
@@ -117,17 +116,15 @@ class Forest:
             else: 
                 self._burning[x, y] = 0
                 
-                if self._trees._gridbis[x, y] < 2:
+                if self._trees._gridbis[x, y] < 10:
                     self._trees[x, y] += 1
-                    self._old += 1
-                    self._young -= 1
     
     # Growing treatment 
     def grow(self, x, y):
         rnd_growth = random.random()
         if rnd_growth <= NEW_GROWTH: 
             self._trees[x, y] = 1 
-            self._young += 1
+            self._tree += 1
             self._empties -= 1
     
     # Make a tree die (reset cell) or make it grow if its strong enough
@@ -135,15 +132,13 @@ class Forest:
         # Tree is not fully burnt
         if self._trees._gridbis[x, y] > 1:
             self._trees[x, y] -= 1
-            self._old -= 1
-            self._young += 1
         
         # Tree dies from burning
         else:
             self._trees[x, y] = 0
             self._burning[x, y] = 0
             self._burnt -= 1
-            self._young -= 1
+            self._tree -= 1
             self._empties += 1
     
     # Update forest

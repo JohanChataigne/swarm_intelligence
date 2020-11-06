@@ -28,7 +28,7 @@ if __name__ == '__main__':
                 done = True
                 continue
 
-        perc = (1 - ((forest._young + forest._old) / forest._init)) * 100
+        perc = (1 - (forest._tree / forest._init)) * 100
         percentageBurnt.append(perc)
         print(f"For density {density:.2f}, {perc:.2f}% of the trees have burnt")
 

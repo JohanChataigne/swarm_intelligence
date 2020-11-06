@@ -12,7 +12,7 @@ class Grid:
     _gridbis = None
     _indexVoisins = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
     
-    def __init__(self, empty=True, ratio=None):
+    def __init__(self, empty=True, ratio=None, circles=0, line=False):
         
         if empty:
             self._grid = np.zeros(__gridDim__, dtype='int8')
@@ -20,7 +20,7 @@ class Grid:
         else:
             assert(ratio is not None)
             size = __gridDim__[0] * __gridDim__[1]
-            self._grid = np.ones(size, dtype='int8')
+            self._grid = np.random.randint(1, 11, size)
             self._grid[:int((1-ratio)*size)] = 0
             np.random.shuffle(self._grid)
             self._gridbis = np.reshape(self._grid, (__gridDim__[0], __gridDim__[1]))
