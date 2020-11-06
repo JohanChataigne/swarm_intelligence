@@ -2,7 +2,7 @@
 
 ## Introduction
 
-![Forest fire simulation with pygame][./images/screen.png]
+![Forest fire simulation with pygame][images/screen.png]
 
 ### Planes
 
@@ -33,7 +33,7 @@ The transition rules are as follows.
 - input_box.py: implements input boxes
 - input_button.py: implements input buttons
 - percolation.py: runs a script to compute the percolation threshold
-- ./results: folder which contains the images generated
+- ./images: folder which contains the images generated
 
 ## Run commands
 
