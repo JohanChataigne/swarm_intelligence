@@ -1,9 +1,10 @@
 import numpy as np
 import random
+import math
 
 # Globals
 __gridSize__ = (900,900) 
-__cellSize__ = 10 
+__cellSize__ = 10
 __gridDim__ = tuple(map(lambda x: int(x/__cellSize__), __gridSize__))
 nx, ny = __gridDim__
 
@@ -12,23 +13,28 @@ class Grid:
     _gridbis = None
     _indexVoisins = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
     
-    def __init__(self, empty=True, ratio=None, line=False, line_width=3, forbidden=None):
+    def __init__(self, empty=True, ratio=None, river=None, river_width=3, forbidden=None):
         
         # Create an empty grid
         if empty:
             self._grid = np.zeros(__gridDim__, dtype='int8')
             self._gridbis = np.zeros(__gridDim__, dtype='int8')
             
-        # Create a grid with one horizontal line of line_width at y0
-        elif line:
+        # Create a grid with one horizontal river of river_width at y0
+        elif river is not None:
             self._grid = np.zeros(__gridDim__, dtype='int8')
             self._gridbis = np.zeros(__gridDim__, dtype='int8')
             
             y0 = np.random.randint(25, 66)
             
             for x in range(nx):
-                for y in range(y0 - line_width//2, y0 + line_width//2 + 1):
-                    self._grid[x, y] = 1
+                #for y in range(y0 - river_width//2, y0 + river_width//2 + 1):
+                for y in range(river_width):
+
+                    if river == "line":
+                        self._grid[x, y0 + y] = 1
+                    elif river == "sin":
+                        self._grid[x, int(y0 + y + math.sin(x))] = 1
         
         # Fill grid available space with ratio*size random values (from 1 to 10)
         else:
@@ -41,7 +47,6 @@ class Grid:
             self._grid = np.reshape(self._grid, (nx, ny))
             
             if forbidden is not None:
-                print(forbidden)
                 for (x, y) in forbidden:
                     self._grid[x, y] = 0
                 

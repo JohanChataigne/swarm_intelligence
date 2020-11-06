@@ -16,7 +16,9 @@ __screenSize__ = (1250,900)
 
 # Get the right color for a given cell
 def getColorCell(n):
-    if n[0]:
+    if n[2]:
+        return (50, 50, 255)
+    elif n[0]:
         if n[1]:
             # Burning tree, color according to burning time
             orange = 165 - (n[1] * 96 / 9)
@@ -49,7 +51,7 @@ class Scene:
         for x in range(ft.gr.nx):
             for y in range(ft.gr.ny):
                 pygame.draw.rect(self._screen, 
-                        getColorCell(self._forest.getTree(x,y)),
+                        getColorCell(self._forest.getCell(x,y)),
                         (x*ft.gr.__cellSize__ + 1, y*ft.gr.__cellSize__ + 1, ft.gr.__cellSize__-2, ft.gr.__cellSize__-2))
 
 
@@ -84,6 +86,9 @@ class Scene:
         
         # Legend for empty cells
         self.drawElement("Empty cell", self._forest._empties, total, 920, 180, 20, 20, __colors__[0])
+        pygame.draw.rect(self._screen, (50, 50, 255), (920, 220, 20, 20))
+        pygame.draw.rect(self._screen, (0, 0, 0), (920, 220, 20, 20), 2)
+        self.drawText("Water", (960, 220))
         
         # Parameters
         self.drawText("Initial tree rate: " + str(ft.TREE_RATIO*100) + "%", (920, 460))

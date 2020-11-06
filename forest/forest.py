@@ -9,8 +9,8 @@ LIGHTNING = 0.00002 #Probability of lightning
 NEW_GROWTH = 0.002 #Probability of new growth
 TREE_RATIO = 0.50 #Tree rate in the space
 TREE_MAX_AGE = 10
-RIVER = True
-RIVER_WIDTH = 3
+RIVER = "line" # Shape of the river (line, sin)
+RIVER_WIDTH = 2
 LAKES = 0
 
 # Map winds with their opposite direction (sense, direction, label)
@@ -24,7 +24,7 @@ WINDS = {
 
 # Wind direction for our forest
 WIND = 0
-# Wind strength (0-3)
+# Wind strength (0-WIND_MAX)
 WIND_STRENGTH = 0
 WIND_MAX = 3
 
@@ -70,9 +70,9 @@ class Forest:
         
         # Grids needed to store burning and tree states of cells
         self._burning = gr.Grid()
-        self._water = gr.Grid(empty=False, line=RIVER, line_width=RIVER_WIDTH)
-        print(1 in self._water._grid)
-        self._trees = gr.Grid(empty=False, ratio=TREE_RATIO, forbidden = [(x, y) for x in range(gr.nx) for y in range(gr.ny) if self._water[x,y] == 1])
+        self._water = gr.Grid(empty=False, river=RIVER, river_width=RIVER_WIDTH)
+        forbidden = [(x, y) for x in range(gr.nx) for y in range(gr.ny) if self._water[x,y] == 1]
+        self._trees = gr.Grid(empty=False, ratio=TREE_RATIO, forbidden=forbidden)
         
         # Element counts 
         self._tree = gr.nx * gr.ny * TREE_RATIO
@@ -91,9 +91,9 @@ class Forest:
         else:
             self._burnt = 0
         
-    # Get state of a tree i.e (tree?, burning?)
-    def getTree(self, x, y):
-        return (self._trees._gridbis[x, y], self._burning._gridbis[x, y])
+    # Get state of a cell i.e (tree?, burning?, water?)
+    def getCell(self, x, y):
+        return (self._trees._gridbis[x, y], self._burning._gridbis[x, y], self._water._gridbis[x, y])
         
     # Tree igniting treatment
     def ignite_grow(self, x, y):
@@ -155,22 +155,25 @@ class Forest:
         for x in range(gr.nx):
             for y in range(gr.ny):
                 
-                cell = self.getTree(x, y)
-                
-                # Treatment for a cell with a tree
-                if cell[0]:
-                    
-                    # Each burning tree turns into an empty cell
-                    if cell[1]:
-                        self.die(x, y)
+                cell = self.getCell(x, y)
 
-                    # Otherwize update tree burning state or age(check neighbours)
-                    else:
-                        self.ignite_grow(x, y)
+                # Treatment for cells not in water
+                if not cell[2]:
                 
-                # Treatment of empty cell
-                else:
-                    self.grow(x, y)
+                    # Treatment for a cell with a tree
+                    if cell[0]:
+                        
+                        # Each burning tree turns into an empty cell
+                        if cell[1]:
+                            self.die(x, y)
+
+                        # Otherwize update tree burning state or age(check neighbours)
+                        else:
+                            self.ignite_grow(x, y)
+                    
+                    # Treatment of empty cell
+                    else:
+                        self.grow(x, y)
         
         #Update copies
         self._trees.updateBis()
