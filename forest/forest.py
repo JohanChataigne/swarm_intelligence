@@ -10,6 +10,7 @@ NEW_GROWTH = 0.002 #Probability of new growth
 TREE_RATIO = 0.50 #Tree rate in the space
 TREE_MAX_AGE = 10
 RIVER = True
+RIVER_WIDTH = 3
 LAKES = 0
 
 # Map winds with their opposite direction (sense, direction, label)
@@ -65,12 +66,13 @@ class Forest:
     _empties = None
     _burnt = None
     
-    def __init__(self, gridTrees, gridBurning):#, gridWater):
+    def __init__(self):#, gridWater):
         
         # Grids needed to store burning and tree states of cells
-        self._trees = gridTrees
-        self._burning = gridBurning
-        #self._water = gridWater
+        self._burning = gr.Grid()
+        self._water = gr.Grid(empty=False, line=RIVER, line_width=RIVER_WIDTH)
+        print(1 in self._water._grid)
+        self._trees = gr.Grid(empty=False, ratio=TREE_RATIO, forbidden = [(x, y) for x in range(gr.nx) for y in range(gr.ny) if self._water[x,y] == 1])
         
         # Element counts 
         self._tree = gr.nx * gr.ny * TREE_RATIO

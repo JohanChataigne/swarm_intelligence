@@ -12,22 +12,49 @@ class Grid:
     _gridbis = None
     _indexVoisins = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
     
-    def __init__(self, empty=True, ratio=None, circles=0, line=False):
+    def __init__(self, empty=True, ratio=None, line=False, line_width=3, forbidden=None):
         
+        # Create an empty grid
         if empty:
             self._grid = np.zeros(__gridDim__, dtype='int8')
             self._gridbis = np.zeros(__gridDim__, dtype='int8')
+            
+        # Create a grid with one horizontal line of line_width at y0
+        elif line:
+            self._grid = np.zeros(__gridDim__, dtype='int8')
+            self._gridbis = np.zeros(__gridDim__, dtype='int8')
+            
+            y0 = np.random.randint(25, 66)
+            
+            for x in range(nx):
+                for y in range(y0 - line_width//2, y0 + line_width//2 + 1):
+                    self._grid[x, y] = 1
+        
+        # Fill grid available space with ratio*size random values (from 1 to 10)
         else:
             assert(ratio is not None)
-            size = __gridDim__[0] * __gridDim__[1]
+            size = nx * ny             
             self._grid = np.random.randint(1, 11, size)
             self._grid[:int((1-ratio)*size)] = 0
             np.random.shuffle(self._grid)
-            self._gridbis = np.reshape(self._grid, (__gridDim__[0], __gridDim__[1]))
-            self._grid = np.reshape(self._grid, (__gridDim__[0], __gridDim__[1]))
-        
+            self._gridbis = np.reshape(self._grid, (nx, ny))
+            self._grid = np.reshape(self._grid, (nx, ny))
+            
+            if forbidden is not None:
+                print(forbidden)
+                for (x, y) in forbidden:
+                    self._grid[x, y] = 0
+                
+                # Free allowed positions in the grid according to the forbidden positions
+                allowed_free = [(x,y) for x in range(nx) for y in range(ny) if (x,y) not in forbidden and self._grid[x,y] == 0]
+                
+                for i in range(len(forbidden)):
+                    rnd_x, rnd_y = allowed_free[np.random.randint(0, len(allowed_free))]
+                    self._grid[rnd_x, rnd_y] = 1
+                
+        self._gridbis = self._grid
+                
         assert (np.array_equal(self._grid, self._gridbis))
-        nx, ny = __gridDim__
 
     def resetIndexVoisins(self):
         self._indexVoisins = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
