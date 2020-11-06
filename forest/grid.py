@@ -38,15 +38,11 @@ class Grid:
     def voisins(self,x,y):
         return [self._gridbis[vx,vy] for (vx,vy) in self.indiceVoisins(x,y)]
     
-    def furtherNeighbours(self, x, y, d):
+    def furtherNeighbours(self, x, y, ws):
         neighbours = self.indiceVoisins(x, y)
         further_neighbours = neighbours.copy()
         
-        # We dont want to exceed a certain wind strength
-        if d > 3: 
-            d = 3
-        
-        for k in range(d-1):
+        for k in range(ws-1):
             tmp_neighbours = [self.indiceVoisins(xbis, ybis) for (xbis, ybis) in neighbours]
             tmp_neighbours = sum(tmp_neighbours, []) #Flatten the list 
             further_neighbours += tmp_neighbours

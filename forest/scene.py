@@ -8,6 +8,7 @@ import forest as ft
 
 
 # Globals
+
 __clock_tick__ = 2
 __colors__ = [(255,255,255),(0,255,0),(255,165,0)]
 __screenSize__ = (1250,900)
@@ -134,7 +135,7 @@ def update_wind_strength(ws_buttons, ws_box):
             if ws_buttons[key].active:
                 if key == "minus" and ft.WIND_STRENGTH > 1:
                     ft.WIND_STRENGTH -= 1
-                elif key == "plus" and ft.WIND_STRENGTH < 3:
+                elif key == "plus" and ft.WIND_STRENGTH < ft.WIND_MAX:
                     ft.WIND_STRENGTH += 1
 
                 ws_box.updateText(str(ft.WIND_STRENGTH))
@@ -148,8 +149,8 @@ if __name__ == '__main__':
 
     # input boxes for parameters
     input_boxes = {}
-    input_boxes["lightning"] = ibox.InputBox(920, 525, 40, 30, scene._screen, text=str(ft.LIGHTNING * 100))
-    input_boxes["new_growth"] = ibox.InputBox(920, 585, 40, 30, scene._screen, text=str(ft.NEW_GROWTH * 100))
+    input_boxes["lightning"] = ibox.InputBox(920, 525, 100, 30, scene._screen, text=str(ft.LIGHTNING * 100))
+    input_boxes["new_growth"] = ibox.InputBox(920, 585, 100, 30, scene._screen, text=str(ft.NEW_GROWTH * 100))
     input_boxes["wind_strength"] = ibox.InputBox(1080, 720, 25, 30, scene._screen, text=str(ft.WIND_STRENGTH), min_width=25, writeable=False)
 
     # buttons for wind direction
