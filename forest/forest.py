@@ -8,6 +8,7 @@ IGNITE = 2
 LIGHTNING = 0.00002 #Probability of lightning
 NEW_GROWTH = 0.002 #Probability of new growth
 TREE_RATIO = 0.50 #Tree rate in the space
+TREE_MAX_AGE = 10
 RIVER = True
 LAKES = 0
 
@@ -32,9 +33,9 @@ WIND_MAX = 3
         Plane 0 indicates the presence of a tree:
             1 = tree, 0 = empty, 2-10 = old tree
         Plane 1 indicates whether a tree is burning:
-            1 = burning, 0 = not burning
+            1 = burning, 0 = not burning, 2-10 = burning time (just visual data)
 
-        The forest is initialized with 'tree_ratio'% of the space occupied by trees.
+        The forest is initialized with 'tree_ratio'% of the space occupied by trees of random age.
         
         The transition rules are as follows.
 
@@ -120,7 +121,7 @@ class Forest:
             else: 
                 self._burning[x, y] = 0
                 
-                if self._trees._gridbis[x, y] < 10:
+                if self._trees._gridbis[x, y] < TREE_MAX_AGE:
                     self._trees[x, y] += 1
     
     # Growing treatment 
@@ -136,6 +137,7 @@ class Forest:
         # Tree is not fully burnt
         if self._trees._gridbis[x, y] > 1:
             self._trees[x, y] -= 1
+            self._burning[x, y] += 1
         
         # Tree dies from burning
         else:

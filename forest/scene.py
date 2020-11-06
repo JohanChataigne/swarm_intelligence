@@ -8,8 +8,9 @@ import forest as ft
 
 
 # Globals
-__clock_tick__ = 5
-__colors__ = [(255,255,255),(0,255,0),(255,140,0)]
+
+__clock_tick__ = 2
+__colors__ = [(255,255,255),(0,255,0),(255,165,0)]
 __screenSize__ = (1250,900)
 
 
@@ -17,12 +18,12 @@ __screenSize__ = (1250,900)
 def getColorCell(n):
     if n[0]:
         if n[1]:
-            # Burning tree
-            return __colors__[2]
+            # Burning tree, color according to burning time
+            orange = 165 - (n[1] * 96 / 9)
+            return (255, orange, 0)
         else:
             # Color according to the tree's age
             green = 255 - (n[0] * 155 / 9)
-            print(green)
             return (0, green, 0)
     else:
         # Empty cell
