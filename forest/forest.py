@@ -56,7 +56,7 @@ WIND_MAX = 3
 def humidity_color():
     #(181,101,29) LIGHT
     #(82,46,13) DARK
-    return (190 - HUMIDITY * 99, 100 - HUMIDITY * 55, 29 - HUMIDITY * 16)
+    return (190 - HUMIDITY * 108, 100 - HUMIDITY * 54, 29 - HUMIDITY * 16)
  
 class Forest:
 
