@@ -4,7 +4,7 @@ import random
 # Globals
 
 # Problem parmeters
-HUMIDITY = 1.0
+HUMIDITY = 0.0
 LIGHTNING = 0.00002 #Probability of lightning
 NEW_GROWTH = 0.002 #Probability of new growth
 TREE_RATIO = 0.50 #Tree rate in the space
@@ -28,35 +28,10 @@ WIND = 0
 WIND_STRENGTH = 0
 WIND_MAX = 3
 
-'''
-                    Forest Fire
-
-        Plane 0 indicates the presence of a tree:
-            1 = tree, 0 = empty, 2-10 = old tree
-        Plane 1 indicates whether a tree is burning:
-            1 = burning, 0 = not burning, 2-10 = burning time (just visual data)
-
-        The forest is initialized with 'tree_ratio'% of the space occupied by trees of random age.
-        
-        The transition rules are as follows.
-
-        1.  A burning tree turns into an empty cell.
-        2.  A non-burning tree with one burning neighbour turns
-            into a burning tree.
-        3.  A tree with no burning neighbour ignites with
-            probability 'lightning' due to lightning.
-        4.  An empty space grows a new tree with probability 'new_growth'.
-        5.  An old tree takes more steps to burn. (1 per year)
-        6.  Fire can only spread in the wind's direction (North = 1, East = 2, South = 3, West = 4).
-        7.  The fire spreads further if the wind is stronger
-        8   Water stops fire, except if the wind is strong enough...
-
-'''
-
 def humidity_color():
-    #(181,101,29) LIGHT
+    #(190,100,29) LIGHT
     #(82,46,13) DARK
-    return (190 - HUMIDITY * 108, 100 - HUMIDITY * 54, 29 - HUMIDITY * 16)
+    return (150 - HUMIDITY * 80, 100 - HUMIDITY * 54, 29 - HUMIDITY * 16)
  
 class Forest:
 
@@ -75,7 +50,10 @@ class Forest:
         
         # Grids needed to store burning and tree states of cells
         self._burning = gr.Grid()
-        self._water = gr.Grid(empty=False, river=RIVER, river_width=RIVER_WIDTH)
+        if RIVER is not None:
+            self._water = gr.Grid(empty=False, river=RIVER, river_width=RIVER_WIDTH)
+        else:
+            self._water = gr.Grid()
         forbidden = [(x, y) for x in range(gr.nx) for y in range(gr.ny) if self._water[x,y] == 1]
         self._trees = gr.Grid(empty=False, ratio=TREE_RATIO, forbidden=forbidden)
         
@@ -137,7 +115,7 @@ class Forest:
     def grow(self, x: int, y: int):
         # A new tree grows from empty cell with a probability depending on humidity rate
         rnd_growth = random.random()
-        if rnd_growth <= NEW_GROWTH * (1 + HUMIDITY): 
+        if rnd_growth <= NEW_GROWTH * (1 + HUMIDITY * 10): 
             self._trees[x, y] = 1 
             self._tree += 1
             self._empties -= 1

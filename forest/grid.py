@@ -50,7 +50,8 @@ class Grid:
                     self._grid[x, y] = 0
                 
                 # Free allowed positions in the grid according to the forbidden positions
-                allowed_free = [(x,y) for x in range(nx) for y in range(ny) if (x,y) not in forbidden and self._grid[x,y] == 0]
+                allowed_free = [(x,y) for x in range(nx) for y in range(ny) if (x,y) not in forbidden
+                                                                                    and self._grid[x,y] == 0]
                 
                 for i in range(len(forbidden)):
                     rnd_x, rnd_y = allowed_free[np.random.randint(0, len(allowed_free))]
@@ -64,7 +65,8 @@ class Grid:
         self._indexVoisins = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
 
     def indiceVoisins(self, x: int, y: int) -> list:
-        return [(dx+x,dy+y) for (dx,dy) in self._indexVoisins if dx+x >=0 and dx+x < __gridDim__[0] and dy+y>=0 and dy+y < __gridDim__[1]] 
+        return [(dx+x,dy+y) for (dx,dy) in self._indexVoisins if dx+x >=0 and dx+x < __gridDim__[0] and dy+y>=0 
+                                                                        and dy+y < __gridDim__[1]] 
 
     def voisins(self,x: int, y: int) -> list:
         return [self._gridbis[vx,vy] for (vx,vy) in self.indiceVoisins(x,y)]
