@@ -22,7 +22,7 @@ def getColorCell(n: tuple) -> tuple:
     elif n[0]:
         if n[1]:
             # Burning tree, color according to burning time
-            orange = 165 - (n[1] * 96 / 9)
+            orange = 165 - (n[1] * 120 / 9)
             return (255, orange, 0)
         else:
             # Color according to the tree's age

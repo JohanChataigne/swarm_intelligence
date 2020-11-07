@@ -4,7 +4,7 @@ import random
 # Globals
 
 # Problem parmeters
-HUMIDITY = 0.0
+HUMIDITY = 1.0
 LIGHTNING = 0.00002 #Probability of lightning
 NEW_GROWTH = 0.002 #Probability of new growth
 TREE_RATIO = 0.50 #Tree rate in the space
@@ -54,10 +54,9 @@ WIND_MAX = 3
 '''
 
 def humidity_color():
-    if HUMIDITY < 0.5:
-        return (255, 255, int(HUMIDITY * 255))
-    else:
-        return (int(255 * (1 - HUMIDITY)), 255, 255)
+    #(181,101,29) LIGHT
+    #(82,46,13) DARK
+    return (190 - HUMIDITY * 108, 100 - HUMIDITY * 54, 29 - HUMIDITY * 16)
  
 class Forest:
 
