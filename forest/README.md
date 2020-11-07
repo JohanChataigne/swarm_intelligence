@@ -42,5 +42,5 @@ The transition rules are as follows.
 
 ## Run commands
 
-- python3 ./scene.py
-- python3 ./percolation.py
+- Run simulation with `make`
+- Run percolation computation with `make percolation`
