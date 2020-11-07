@@ -9,15 +9,15 @@ Authors: [Germon Paul](https://github.com/pgermon) and [Chataigner Johan](https:
 
 The data representation of the forest is implemented by 3 planes:
 
-Plane 0 indicates the presence of a tree: 1-10 = tree age, 0 = empty  
-Plane 1 indicates whether a tree is burning: 1-10 = burning time, 0 = not burning
-Plane 2 indicates the presence of water: 1 = water, 0 = empty  
+First plane indicates the presence of a tree: 1-10 = tree age, 0 = empty  
+Second plane indicates whether a tree is burning: 1-10 = burning time, 0 = not burning
+Third plane indicates the presence of water: 1 = water, 0 = empty  
 
-The forest is initialized with 'tree_ratio'% of the space occupied by trees of random age.
+The forest is initialized with a certain ratio of the space occupied by trees of random age.
 
-### Rules
+### Evolution rules
 
-The transition rules are as follows.
+The evolution rules are as follows:
 
 1.  A fully burnt tree turns into an empty cell.
 2.  A non-burning tree can turn into a burning tree with probability depending on its number of neighbors burning and humidity rate.
@@ -29,6 +29,10 @@ The transition rules are as follows.
 8.  Fire can't spread in the opposite wind's direction.
 9.  The stronger the wind, the further the fire can spread.
 10.  Trees can't grow in water: water stops fire, except if the wind is strong enough.
+
+## Pygame interface
+
+![Pygame interface](images/interface.png)
 
 ## Files and folders
 
