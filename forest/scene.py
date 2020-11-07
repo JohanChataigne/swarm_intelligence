@@ -113,19 +113,7 @@ class Scene:
     def update(self):
         self._forest.update()
 
-        
-# Try to cast 'try_val' with cast() and assign it to var, or 'except_val' if it fails
-def try_except_cast(try_val: str, max_val, except_val, cast, box):
-    try:
-        ret = cast(try_val)
-        if ret > max_val:
-            ret = max_val
-            box.updateText(str(ret))
 
-    except ValueError:
-        ret = except_val
-    
-    return ret
 
 # Updates the wind according to the UI  
 def update_wind_dir(buttons: dict, inputs: dict):
@@ -174,10 +162,10 @@ if __name__ == '__main__':
 
     # input boxes for parameters
     input_boxes = {}
-    input_boxes["humidity"] = ibox.InputBox(920, 465, 100, 30, scene._screen, text=str(ft.HUMIDITY * 100))
-    input_boxes["lightning"] = ibox.InputBox(920, 525, 100, 30, scene._screen, text=str(ft.LIGHTNING * 100))
-    input_boxes["new_growth"] = ibox.InputBox(920, 585, 100, 30, scene._screen, text=str(ft.NEW_GROWTH * 100))
-    input_boxes["wind_strength"] = ibox.InputBox(1110, 720, 25, 30, scene._screen, text=str(ft.WIND_STRENGTH), min_width=25, writeable=False)
+    input_boxes["humidity"] = ibox.InputBox(920, 465, 100, 30, scene._screen, 100, 0.0, float, text=str(ft.HUMIDITY * 100))
+    input_boxes["lightning"] = ibox.InputBox(920, 525, 100, 30, scene._screen, 100, 0.0, float, text=str(ft.LIGHTNING * 100))
+    input_boxes["new_growth"] = ibox.InputBox(920, 585, 100, 30, scene._screen, 100, 0.0, float, text=str(ft.NEW_GROWTH * 100))
+    input_boxes["wind_strength"] = ibox.InputBox(1110, 720, 25, 30, scene._screen, ft.WIND_MAX, 0, int, text=str(ft.WIND_STRENGTH), min_width=25, writeable=False)
 
     # buttons for wind direction
     wind_buttons = {}
@@ -230,10 +218,10 @@ if __name__ == '__main__':
            box.update()
         
         # Convert input we get from the UI
-        ft.HUMIDITY = try_except_cast(input_boxes["humidity"].text, 100, 0, float, input_boxes["humidity"]) / 100
-        ft.LIGHTNING = try_except_cast(input_boxes["lightning"].text, 100, 0, float, input_boxes["lightning"]) / 100
-        ft.NEW_GROWTH = try_except_cast(input_boxes["new_growth"].text, 100, 0, float, input_boxes["new_growth"]) / 100
-        ft.WIND_STRENGTH = try_except_cast(input_boxes["wind_strength"].text, ft.WIND_MAX, 0, int, input_boxes["wind_strength"])
+        ft.HUMIDITY = input_boxes["humidity"].try_except_cast() / 100
+        ft.LIGHTNING = input_boxes["lightning"].try_except_cast() / 100
+        ft.NEW_GROWTH = input_boxes["new_growth"].try_except_cast() / 100
+        ft.WIND_STRENGTH = input_boxes["wind_strength"].try_except_cast()
        
         # Check which wind button is active and update the wind parameters accordingly     
         update_wind_dir(wind_buttons, input_boxes)

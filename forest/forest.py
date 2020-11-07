@@ -4,7 +4,7 @@ import random
 # Globals
 
 # Problem parmeters
-HUMIDITY = 0
+HUMIDITY = 0.0
 LIGHTNING = 0.00002 #Probability of lightning
 NEW_GROWTH = 0.002 #Probability of new growth
 TREE_RATIO = 0.50 #Tree rate in the space
