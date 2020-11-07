@@ -67,7 +67,7 @@ class Scene:
     def drawText(self, text: str, position: tuple, color = (0,0,0)):
         self._screen.blit(self._font.render(text,1,color),position)
 
-    def drawElement(self, name: str, elem, total: int, x: int, y: int, w: int, h: int, color: tuple):
+    def drawElement(self, name: str, elem: int, total: int, x: int, y: int, w: int, h: int, color: tuple):
         pygame.draw.rect(self._screen, color, (x, y, w, h))
         pygame.draw.rect(self._screen, (0, 0, 0), (x, y, w, h), 2)
         self.drawText(name + " (" + str(int(elem)) + " / " + str(np.round(1.*elem/total * 100, 2)) + "%)", (x + 40, y))
@@ -132,7 +132,7 @@ def update_wind_dir(buttons: dict, inputs: dict):
             else:
                 ft.WIND_STRENGTH = 0
 
-            inputs["wind_strength"].updateText(str(ft.WIND_STRENGTH))
+            inputs["wind_strength"].updateText(ft.WIND_STRENGTH)
             return
 
 # Updates the wind according to the UI  
@@ -150,7 +150,7 @@ def update_wind_strength(ws_buttons: dict, ws_box, wind_buttons: dict):
                 elif key == "plus" and ft.WIND_STRENGTH < ft.WIND_MAX:
                     ft.WIND_STRENGTH += 1
 
-                ws_box.updateText(str(ft.WIND_STRENGTH))
+                ws_box.updateText(ft.WIND_STRENGTH)
 
         
 
@@ -162,10 +162,10 @@ if __name__ == '__main__':
 
     # input boxes for parameters
     input_boxes = {}
-    input_boxes["humidity"] = ibox.InputBox(920, 465, 100, 30, scene._screen, 100, 0.0, float, text=str(ft.HUMIDITY * 100))
-    input_boxes["lightning"] = ibox.InputBox(920, 525, 100, 30, scene._screen, 100, 0.0, float, text=str(ft.LIGHTNING * 100))
-    input_boxes["new_growth"] = ibox.InputBox(920, 585, 100, 30, scene._screen, 100, 0.0, float, text=str(ft.NEW_GROWTH * 100))
-    input_boxes["wind_strength"] = ibox.InputBox(1110, 720, 25, 30, scene._screen, ft.WIND_MAX, 0, int, text=str(ft.WIND_STRENGTH), min_width=25, writeable=False)
+    input_boxes["humidity"] = ibox.InputBox(920, 465, 100, 30, scene._screen, ft.HUMIDITY * 100, 100, 0.0, float, increment=1, decimals=1)
+    input_boxes["lightning"] = ibox.InputBox(920, 525, 100, 30, scene._screen, ft.LIGHTNING * 100, 100, 0.0, float, increment=0.001, decimals=3)
+    input_boxes["new_growth"] = ibox.InputBox(920, 585, 100, 30, scene._screen, ft.NEW_GROWTH * 100, 100, 0.0, float, increment=0.1, decimals=1)
+    input_boxes["wind_strength"] = ibox.InputBox(1110, 720, 25, 30, scene._screen, ft.WIND_STRENGTH, ft.WIND_MAX, 0, int, min_width=25, writeable=False)
 
     # buttons for wind direction
     wind_buttons = {}
