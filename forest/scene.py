@@ -30,7 +30,7 @@ def getColorCell(n: tuple) -> tuple:
             return (0, green, 0)
     else:
         # Empty cell
-        return COLOR_EMPTY #ft.humidity_color()
+        return ft.humidity_color()
 
 class Scene:
     _mouseCoords = (0,0)
@@ -48,7 +48,7 @@ class Scene:
         if self._forest._trees is None or self._forest._burning is None:
             return
         self._screen.fill((255,255,255))
-        #pygame.draw.rect(self._screen, ft.humidity_color(), (0, 0, ft.gr.__gridSize__[0], ft.gr.__gridSize__[1]))
+        pygame.draw.rect(self._screen, ft.humidity_color(), (0, 0, ft.gr.__gridSize__[0], ft.gr.__gridSize__[1]))
 
         for x in range(ft.gr.nx):
             for y in range(ft.gr.ny):
@@ -94,7 +94,7 @@ class Scene:
         self.drawText("Burning trees (" + str(int(self._forest._burnt)) + " / " + str(np.round(1.*self._forest._burnt/total * 100, 2)) + "%)", (960, 140))
         
         # Legend for empty cells
-        self.drawElement("Empty cell", self._forest._empties, total, 920, 180, 20, 20, COLOR_EMPTY) #, ft.humidity_color()
+        self.drawElement("Empty cell", self._forest._empties, total, 920, 180, 20, 20, ft.humidity_color())
         pygame.draw.rect(self._screen, (50, 50, 255), (920, 220, 20, 20))
         pygame.draw.rect(self._screen, (0, 0, 0), (920, 220, 20, 20), 2)
         self.drawText("Water", (960, 220))

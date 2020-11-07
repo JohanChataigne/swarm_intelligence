@@ -53,6 +53,7 @@ class InputBox:
             elif event.type == pg.KEYDOWN and self.active:
                 if event.key == pg.K_RETURN:
                     self.active = False
+                    self.text = str(self.try_except_cast())
                 elif event.key == pg.K_BACKSPACE:
                     self.text = self.text[:-1]
                 elif event.key == pg.K_SEMICOLON:
