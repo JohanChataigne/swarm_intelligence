@@ -13,6 +13,7 @@ RIVER = "line" # Shape of the river (line, sin)
 RIVER_WIDTH = 2
 LAKES = 0
 CLOUDS = 20
+COLOR_CLOUDS = (20, 20, 20)
 
 # Map winds with their opposite direction (sense, direction, label)
 WINDS = {
@@ -33,6 +34,14 @@ def humidity_color():
     #(190,100,29) LIGHT
     #(82,46,13) DARK
     return (150 - HUMIDITY * 80, 100 - HUMIDITY * 54, 29 - HUMIDITY * 16)
+
+def clouds_color(color: tuple):
+    cloud = [color[i] - COLOR_CLOUDS[i] for i in range(3)]
+
+    for i in range(len(cloud)):
+        if cloud[i] < 0:
+            cloud[i] = 0
+    return tuple(cloud)
  
 class Forest:
 
