@@ -12,6 +12,7 @@ TREE_MAX_AGE = 10
 RIVER = "line" # Shape of the river (line, sin)
 RIVER_WIDTH = 2
 LAKES = 0
+CLOUDS = 20
 
 # Map winds with their opposite direction (sense, direction, label)
 WINDS = {
@@ -39,6 +40,7 @@ class Forest:
     _trees = None
     _burning = None
     _water = None
+    _clouds = None
     
     # Element counts
     _tree = None
@@ -50,10 +52,18 @@ class Forest:
         
         # Grids needed to store burning and tree states of cells
         self._burning = gr.Grid()
+
         if RIVER is not None:
             self._water = gr.Grid(empty=False, river=RIVER, river_width=RIVER_WIDTH)
         else:
             self._water = gr.Grid()
+
+        if CLOUDS is not None:
+            clouds = self.generate_clouds(CLOUDS)
+            self._clouds = gr.Grid(empty=False, clouds=clouds)
+        else:
+            self._clouds = gr.Grid()
+
         forbidden = [(x, y) for x in range(gr.nx) for y in range(gr.ny) if self._water[x,y] == 1]
         self._trees = gr.Grid(empty=False, ratio=TREE_RATIO, forbidden=forbidden)
         
@@ -74,10 +84,26 @@ class Forest:
         else:
             self._burnt = 0
 
-     
+    def generate_clouds(self, n: int) -> list:
+        clouds = []
+        for k in range(n):
+            x = random.randint(0, gr.nx - 1)
+            y = random.randint(0, gr.ny - 1)
+            w = random.randint(5, 15)
+            h = random.randint(10, 20)
+
+            for i in range(w):
+                if i != 0 and i != w - 1:
+                    clouds.append(((x + i) % gr.nx, (y - 1) % gr.ny))
+                    clouds.append(((x + i) % gr.nx, (y + h) % gr.ny))
+                for j in range(h):
+                    clouds.append(((x + i) % gr.nx, (y + j) % gr.ny))
+        return clouds   
+    
     # Get state of a cell i.e (tree?, burning?, water?)
     def getCell(self, x: int, y: int) -> tuple:
-        return (self._trees._gridbis[x, y], self._burning._gridbis[x, y], self._water._gridbis[x, y])
+        return (self._trees._gridbis[x, y], self._burning._gridbis[x, y],
+                 self._water._gridbis[x, y], self._clouds._gridbis[x, y])
         
     # Tree igniting treatment
     def ignite_grow(self, x: int, y: int):
@@ -176,6 +202,18 @@ class Forest:
         #Update copies
         self._trees.updateBis()
         self._burning.updateBis()
+
+    def update_clouds(self):
+        dxy = [(0, 0), (0, -1), (1, 0), (0, 1), (-1, 0)]
+        dx = dxy[WIND][0] * WIND_STRENGTH
+        dy = dxy[WIND][1] * WIND_STRENGTH
+
+        for x in range(gr.nx):
+            for y in range(gr.ny):
+                self._clouds[(x + dx) % gr.nx, (y + dy) % gr.ny] = self._clouds._gridbis[x, y]
+
+
+        self._clouds.updateBis()
                     
 
 

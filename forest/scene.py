@@ -13,23 +13,38 @@ __clock_tick__ = 2
 __screenSize__ = (1250,900)
 WATER_COLOR = (50, 50, 255)
 COLOR_EMPTY = (255, 255, 255)
+COLOR_CLOUDS = (30, 30, 30)
+
+def clouds_color(color: tuple):
+    cloud = [color[i] - COLOR_CLOUDS[i] for i in range(3)]
+
+    for i in range(len(cloud)):
+        if cloud[i] < 0:
+            cloud[i] = 0
+    return tuple(cloud)
 
 
 # Get the right color for a given cell
-def getColorCell(n: tuple) -> tuple:
-    if n[2]:
+def getColorCell(cell: tuple) -> tuple:
+    # The cell contains water
+    if cell[2]:
         return WATER_COLOR
-    elif n[0]:
-        if n[1]:
+    
+    # The cell contains a tree
+    elif cell[0]:
+
+        # The cell contains a burning tree
+        if cell[1]:
             # Burning tree, color according to burning time
-            orange = 165 - (n[1] * 120 / 9)
+            orange = 165 - (cell[1] * 120 / 9)
             return (255, orange, 0)
         else:
             # Color according to the tree's age
-            green = 255 - (n[0] * 155 / 9)
+            green = 255 - (cell[0] * 155 / 9)
             return (0, green, 0)
+
+    # The cell is empty
     else:
-        # Empty cell
         return ft.humidity_color()
 
 class Scene:
@@ -43,23 +58,39 @@ class Scene:
         self._font = pygame.font.SysFont('Arial',20)
         self._forest = ft.Forest()
 
+    def drawClouds(self):
+        if self._forest._clouds is not None:
+            for x in range(ft.gr.nx):
+                for y in range(ft.gr.ny):
+                    if self._forest._clouds[x, y]:
+                        color = clouds_color(ft.humidity_color())
+                        pygame.draw.circle(self._screen, color, 
+                                        (x*ft.gr.__cellSize__  + 5, y*ft.gr.__cellSize__ +5), ft.gr.__cellSize__*0.7)
+
+
+    def drawBackground(self):
+        self._screen.fill((255,255,255))
+        pygame.draw.rect(self._screen, ft.humidity_color(), (0, 0, ft.gr.__gridSize__[0], ft.gr.__gridSize__[1]))
+
     # Metho drawing actual forest simulation on the scene 
     def drawMe(self):
         if self._forest._trees is None or self._forest._burning is None:
             return
-        self._screen.fill((255,255,255))
-        pygame.draw.rect(self._screen, ft.humidity_color(), (0, 0, ft.gr.__gridSize__[0], ft.gr.__gridSize__[1]))
-
+        
         for x in range(ft.gr.nx):
             for y in range(ft.gr.ny):
                 
-                color = getColorCell(self._forest.getCell(x,y))
-                if color == WATER_COLOR:
+                cell = self._forest.getCell(x,y)
+                if cell[2]:
+                    color = WATER_COLOR
+                    if cell[3]:
+                        color = clouds_color(color)
                     pygame.draw.rect(self._screen, color, 
                                         (x*ft.gr.__cellSize__, y*ft.gr.__cellSize__, ft.gr.__cellSize__, ft.gr.__cellSize__))
-                    '''pygame.draw.rect(self._screen, (0, 130, 255), 
-                                        (x*ft.gr.__cellSize__, y*ft.gr.__cellSize__, ft.gr.__cellSize__, ft.gr.__cellSize__), 1)'''
-                else:                    
+                elif cell[0]:
+                    color = getColorCell(cell)
+                    if cell[3]:
+                        color = clouds_color(color)                    
                     pygame.draw.circle(self._screen, color, 
                                         (x*ft.gr.__cellSize__ + 5, y*ft.gr.__cellSize__ + 5), ft.gr.__cellSize__/2)
 
@@ -184,6 +215,8 @@ if __name__ == '__main__':
     while done == False:
 
         # Display the screen
+        scene.drawBackground()
+        scene.drawClouds()
         scene.drawMe()
         scene.drawLegend()
         for box in input_boxes.values():
@@ -226,6 +259,7 @@ if __name__ == '__main__':
         # Check which wind button is active and update the wind parameters accordingly     
         update_wind_dir(wind_buttons, input_boxes)
         update_wind_strength(ws_buttons, input_boxes["wind_strength"], wind_buttons)
+        scene._forest.update_clouds()
 
     pygame.quit()
         

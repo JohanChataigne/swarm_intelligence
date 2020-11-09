@@ -13,7 +13,7 @@ class Grid:
     _gridbis = None
     _indexVoisins = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
     
-    def __init__(self, empty=True, ratio=None, river=None, river_width=3, forbidden=None):
+    def __init__(self, empty=True, ratio=None, river=None, river_width=3, forbidden=None, clouds=None):
         
         # Create an empty grid
         if empty:
@@ -34,6 +34,12 @@ class Grid:
                         self._grid[x, y0 + y] = 1
                     elif river == "sin":
                         self._grid[x, int(y0 + y + math.sin(x))] = 1
+
+        elif clouds is not None:
+            self._grid = np.zeros(__gridDim__, dtype='int8')
+
+            for x, y in clouds:
+                self._grid[x, y] = 1
         
         # Fill grid available space with ratio*size random values (from 1 to 10)
         else:
