@@ -65,7 +65,7 @@ class Scene:
                     if self._forest._clouds[x, y]:
                         color = clouds_color(ft.humidity_color())
                         pygame.draw.circle(self._screen, color, 
-                                        (x*ft.gr.__cellSize__  + 5, y*ft.gr.__cellSize__ +5), ft.gr.__cellSize__*0.7)
+                                        (x*ft.gr.__cellSize__  + 5, y*ft.gr.__cellSize__ +5), ft.gr.__cellSize__ *0.7)
 
 
     def drawBackground(self):
@@ -101,7 +101,7 @@ class Scene:
     def drawElement(self, name: str, elem: int, total: int, x: int, y: int, w: int, h: int, color: tuple):
         pygame.draw.rect(self._screen, color, (x, y, w, h))
         pygame.draw.rect(self._screen, (0, 0, 0), (x, y, w, h), 2)
-        self.drawText(name + " (" + str(int(elem)) + " / " + str(np.round(1.*elem/total * 100, 2)) + "%)", (x + 40, y))
+        self.drawText(name + " (" + str(int(elem)) + " / " + str(np.round(1.*elem/total * 100, 2)) + "% of cells)", (x + 40, y))
     
     def drawLegend(self):
         total = ft.gr.nx * ft.gr.ny 
@@ -121,8 +121,8 @@ class Scene:
         pygame.draw.rect(self._screen, (0, 0, 0), (920, 140, 20, 20), 2)
         
         # Text en measures
-        self.drawText("Trees (" + str(int(self._forest._tree)) + " / " + str(np.round(1.*self._forest._tree/total * 100, 2)) + "%)", (960, 100))
-        self.drawText("Burning trees (" + str(int(self._forest._burnt)) + " / " + str(np.round(1.*self._forest._burnt/total * 100, 2)) + "%)", (960, 140))
+        self.drawText("Trees (" + str(int(self._forest._tree)) + " / " + str(np.round(1.*self._forest._tree/total * 100, 2)) + "% of cells)", (960, 100))
+        self.drawText("Burning trees (" + str(int(self._forest._burnt)) + " / " + str(np.round(1.*self._forest._burnt/self._forest._tree * 100, 2)) + "% of trees)", (960, 140))
         
         # Legend for empty cells
         self.drawElement("Empty cell", self._forest._empties, total, 920, 180, 20, 20, ft.humidity_color())

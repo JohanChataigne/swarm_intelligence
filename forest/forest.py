@@ -105,7 +105,7 @@ class Forest:
         return (self._trees._gridbis[x, y], self._burning._gridbis[x, y],
                  self._water._gridbis[x, y], self._clouds._gridbis[x, y])
         
-    # Tree igniting treatment
+    # Tree igniting and age growing treatment
     def ignite_grow(self, x: int, y: int):
 
         # Computes the neighbours of the cell (x, y) depending on the wind
@@ -155,7 +155,7 @@ class Forest:
             self._burning[x, y] -= int(HUMIDITY * 10)
 
             # Stops burning
-            if self._burning[x, y] < 0:
+            if self._burning[x, y] <= 0:
                 self._burning[x, y] = 0
                 self._burnt -= 1
 
