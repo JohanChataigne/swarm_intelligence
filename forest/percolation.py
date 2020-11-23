@@ -6,17 +6,19 @@ import forest as ft
 
 if __name__ == '__main__':
 
-    ft.lightning = 0
-    ft.new_growth = 0
-    ft.WIND = 0
-    ft.WIND_STRENGTH = 0
+    ft.LIGHTNING = 0
+    ft.NEW_GROWTH = 0
+    ft.WIND = 1
+    ft.WIND_STRENGTH = 1
+    ft.RIVER = None
+    ft.CLOUDS = None
 
     densities = [d for d in np.arange(0.01, 1, 0.01)]
     percentageBurnt = []
 
     for density in densities:
-        ft.tree_ratio = density
-        forest = ft.Forest(ft.gr.Grid(empty=False, ratio=density), ft.gr.Grid())
+        ft.TREE_RATIO = density
+        forest = ft.Forest()
 
         done = False       
         while done == False:
@@ -36,4 +38,4 @@ if __name__ == '__main__':
     plt.ylabel("Percentage of trees burnt")
     plt.plot(densities, percentageBurnt)
     plt.show()
-    plt.savefig("./results/percolation.png")
+    plt.savefig("./images/percolation.png")

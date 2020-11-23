@@ -3,7 +3,7 @@ import random
 
 # Globals
 
-# Problem parmeters
+# Problem parameters
 HUMIDITY = 0.0
 LIGHTNING = 0.00002 #Probability of lightning
 NEW_GROWTH = 0.002 #Probability of new growth
@@ -11,7 +11,6 @@ TREE_RATIO = 0.50 #Tree rate in the space
 TREE_MAX_AGE = 10
 RIVER = "line" # Shape of the river (line, sin)
 RIVER_WIDTH = 2
-LAKES = 0
 CLOUDS = 20
 COLOR_CLOUDS = (20, 20, 20)
 
@@ -57,7 +56,7 @@ class Forest:
     _empties = None
     _burnt = None
     
-    def __init__(self):#, gridWater):
+    def __init__(self):
         
         # Grids needed to store burning and tree states of cells
         self._burning = gr.Grid()
@@ -78,6 +77,7 @@ class Forest:
         
         # Element counts 
         self._tree = gr.nx * gr.ny * TREE_RATIO
+        self._init = self._tree
         self._empties = gr.nx * gr.ny * (1-TREE_RATIO)
 
         # If no lightning probability, one tree ignites at the beginning (usefull for percolation)

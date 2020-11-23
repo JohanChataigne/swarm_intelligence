@@ -6,4 +6,4 @@ simulation:
 	$(PY) scene.py
 
 percolation:
-	$(PY) percolation.python
+	$(PY) percolation.py
